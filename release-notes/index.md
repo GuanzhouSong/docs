@@ -15,8 +15,8 @@ behind these pages live in the
 
 | Version | Tag date | Notes |
 | --- | --- | --- |
-| [v0.114-0](v0.114-0.md) | 2026-06-16 | Current release. Schema validation on by default, gateway environment-variable configuration, non-blocking unique index builds. |
-| [v0.113-0](v0.113-0.md) | 2026-05-11 | Collation support for non-unique ordered indexes, `$sortGroup` accumulator sort pushdown, TTL dead-entry pruning. |
+| [v0.114-0](/docs/release-notes/v0.114-0) | 2026-06-16 | Current release. Schema validation on by default, gateway environment-variable configuration, non-blocking unique index builds. |
+| [v0.113-0](/docs/release-notes/v0.113-0) | 2026-05-11 | Collation support for non-unique ordered indexes, `$sortGroup` accumulator sort pushdown, TTL dead-entry pruning. |
 
 Older releases are listed on the
 [GitHub releases page](https://github.com/documentdb/documentdb/releases).

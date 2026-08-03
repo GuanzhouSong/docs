@@ -41,7 +41,7 @@ behavior, set them back explicitly in `postgresql.conf`.
 | `documentdb.enableUniqueReindex` | `on` | Changed in v0.114-0 (previously `off`) |
 | `documentdb.EnableOperatorVariablesInLookup` | `on` | Changed in v0.114-0 (previously `off`) |
 
-See the [v0.114-0 release notes](../release-notes/v0.114-0.md) for the full list of
+See the [v0.114-0 release notes](/docs/release-notes/v0.114-0) for the full list of
 configuration changes in that release.
 
 ### Off-by-default feature flags
