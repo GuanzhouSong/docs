@@ -63,7 +63,7 @@ The server returns a document similar to the following:
   "msg": "isdbgrid",
   "maxBsonObjectSize": 16777216,
   "maxMessageSizeBytes": 48000000,
-  "maxWriteBatchSize": 25000,
+  "maxWriteBatchSize": 100000,
   "localTime": 1783006410548,
   "logicalSessionTimeoutMinutes": 30,
   "minWireVersion": 0,

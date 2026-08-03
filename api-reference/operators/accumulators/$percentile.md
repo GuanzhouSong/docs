@@ -25,7 +25,7 @@ $percentile: {
 | --- | --- |
 | **`input`** | Specifies the numerical data to calculate the percentile from. |
 | **`p`** | An array of percentile values (between 0 and 1) to calculate. |
-| **`method`** | Specifies the interpolation method to use. Valid values are `"approximate"` and `"continuous"`. |
+| **`method`** | Specifies the interpolation method to use. The only supported value is `"approximate"`; other values (including `"continuous"`) are rejected. |
 
 ## Examples
 
