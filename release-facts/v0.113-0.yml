@@ -1,0 +1,3366 @@
+ref: v0.113-0
+commit: c0cdc8c261ffaea336b9bf7442146ec16f8c1837
+gucs:
+- name: documentdb.EnableOperatorVariablesInLookup
+  type: bool
+  default: 'false'
+  description: Whether or not to enable operator variables($map.as alias) support in let variables spec.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.IsPgReadOnlyForDiskFull
+  type: bool
+  default: 'false'
+  description: Determines whether postgres is in readonly mode since disk is full
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.SingleTTLTaskTimeBudget
+  type: int
+  default: '20000'
+  description: Time budget assigned in milliseconds for TTL task to purge one batch of documents from
+    each eligible TTL indexes once.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.TTLPurgerLockTimeout
+  type: int
+  default: '10000'
+  description: Lock timeout in milliseconds of the TTL purger delete query.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.TTLPurgerStatementTimeout
+  type: int
+  default: '60000'
+  description: Statement timeout in milliseconds of the TTL purger delete query.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.TTLSkipCaughtUpIndexes
+  type: bool
+  default: 'true'
+  description: Whether to skip checking a TTL index further, once they are caught up during a TTL task
+    invocation cycle.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.TTLTaskMaxRunTimeInMS
+  type: int
+  default: '60000'
+  description: Time budget assigned in milliseconds for single invocation of ttl task.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.aggregation_stages_limit
+  type: int
+  default: '1000'
+  description: The number of maximum aggregation stages allowed in a pipeline.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1000'
+  max: 5 * DEFAULT_AGGREGATION_STAGES_LIMIT
+- name: documentdb.alternate_index_handler_name
+  type: string
+  default: ''
+  description: The name of the index handler to use as opposed to rum.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.backgroundWorkerJobTimeoutThresholdSec
+  type: int
+  default: '300'
+  description: Maximum allowed value in seconds for a background worker job timeout.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.batchUpdateLockTimeoutMs
+  type: int
+  default: '20'
+  description: The lock timeout in milliseconds for each batch of updates within bulk procedural write
+    path.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.batchWriteSubTransactionCount
+  type: int
+  default: '512'
+  description: The size of each sub-transaction within any write command.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.bg_worker_database_name
+  type: string
+  default: postgres
+  description: Database to which background worker will connect.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.bg_worker_latch_timeout
+  type: int
+  default: '1'
+  description: Latch timeout inside main thread of bg worker leader.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '0'
+  max: '200'
+- name: documentdb.blockedRolePrefixList
+  type: string
+  default: ''
+  description: List of role prefixes that are blocked from being created/deleted. The list of role prefixes
+    are comma separated.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.coll_stats_count_policy_threshold
+  type: int
+  default: '10000'
+  description: Set the collStats 'count policy' change threshold
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX - 1
+- name: documentdb.createTTLIndexAsCompositeByDefault
+  type: bool
+  default: 'true'
+  description: Whether to always create TTL indexes as composite indexes by default.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.currentOpAddSqlCommand
+  type: bool
+  default: 'false'
+  description: Whether to add the SQL command to the current operation view.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.current_op_application_name
+  type: string
+  default: ''
+  description: Application name that is tracked for current_op. '' means track all
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.defaultCursorExpiryTimeLimitSeconds
+  type: int
+  default: '60'
+  description: Default expiry time limit for cursor.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: '3600'
+- name: documentdb.defaultCursorFirstPageBatchSize
+  type: int
+  default: '101'
+  description: The default batch size for the first page of a cursor.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.defaultUniqueIndexKeyhashOverride
+  type: int
+  default: '0'
+  description: Do not set this in production. GUC used to force a single keyhash result value for testing
+    hash conflicts on unique indexes that require a runtime recheck.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.defaultUseCompositeOpClass
+  type: bool
+  default: 'true'
+  description: Whether to enable the new ordered index opclass for default index creates
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.disableExtendedRumExplainPlans
+  type: bool
+  default: 'false'
+  description: Disable extended rum explain plan overrides. Used to match default rum explains
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableAddToSetAggregationRewrite
+  type: bool
+  default: 'true'
+  description: Whether to enable the new addToSet aggregation implementation that prevents crashes with
+    the new delayed portal feature.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableBackgroundWorker
+  type: bool
+  default: 'true'
+  description: Enable the extension Background worker.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableBackgroundWorkerInitJobs
+  type: bool
+  default: 'false'
+  description: Enable the execution of init background jobs.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableBackgroundWorkerJobs
+  type: bool
+  default: 'true'
+  description: Enable the execution of the pre-defined background worker jobs.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableBinarySearchForOrderedMove
+  type: bool
+  default: 'true'
+  description: Whether to enable binary search for ordered move.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableBypassDocumentValidation
+  type: bool
+  default: 'false'
+  description: Whether or not to support 'bypassDocumentValidation'.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCollModUnique
+  type: bool
+  default: 'false'
+  description: Whether to enable unique for coll mod.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCollationWithNewGroupAccumulators
+  type: bool
+  default: 'false'
+  description: Determines whether collation is enabled with the new group accumulators.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCollationWithNonUniqueOrderedIndexes
+  type: bool
+  default: 'false'
+  description: Determines whether collation is supported for non-unique ordered/composite indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableComparableTerms
+  type: bool
+  default: 'false'
+  description: Whether to enable comparable terms feature.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeIndexPlanner
+  type: bool
+  default: 'false'
+  description: Whether to enable the new ordered index opclass planner improvements
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeParallelIndexScan
+  type: bool
+  default: 'false'
+  description: Whether to enable parallel index scans for composite indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableCompositeReducedCorrelatedPrefixTrim
+  type: bool
+  default: 'true'
+  description: Whether to enable prefix-group-aware trimming of secondary variable bounds for reduced
+    correlated composite indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeReducedCorrelatedTerms
+  type: bool
+  default: 'false'
+  description: Whether to enable reduced term generation for correlated composite paths.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeReducedCorrelatedTermsOnCommonSubPath
+  type: bool
+  default: 'true'
+  description: Whether to enable reduced term generation for correlated composite paths on common sub-paths.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeShardDocumentTerms
+  type: bool
+  default: 'true'
+  description: Whether to enable shard hash term generation for composite indexes (specially for null
+    handling).
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeUniqueHash
+  type: bool
+  default: 'true'
+  description: Whether to enable new unique hash equality implementation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeWildcardIndex
+  type: bool
+  default: 'true'
+  description: Whether to enable composite wildcard index support
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCompositeWildcardSkipEmptyEntries
+  type: bool
+  default: 'true'
+  description: Whether to enable skipping empty entries for composite wildcard indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableContinuationFastBitmapLookup
+  type: bool
+  default: 'false'
+  description: Whether to enable skipping bitmap records by tid without loading the heap to find the continuation
+    point.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableConversionStreamableToSingleBatch
+  type: bool
+  default: 'true'
+  description: Whether to enable conversion streamable to single batch queries.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCursorPlanBeforeRestrictionPathUpdate
+  type: bool
+  default: 'true'
+  description: Whether to enable running the streaming cursor plan rewrite before path replacement.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableCursorsOnAggregationQueryRewrite
+  type: bool
+  default: 'false'
+  description: Whether or not to add the cursors on aggregation style queries.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableDataTableWithoutCreationTime
+  type: bool
+  default: 'true'
+  description: Create data table without creation_time column.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableDbNameValidation
+  type: bool
+  default: 'true'
+  description: Whether to enforce that $db in the command body matches the database argument.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enableDeadIndexEntryMarkingByTTLTask
+  type: bool
+  default: 'false'
+  description: Whether to enable marking dead index entries during TTL task scans to avoid redundant heap
+    fetches.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableDebugQueryText
+  type: bool
+  default: 'false'
+  description: Whether to enable query source text while planning aggregate/find queries for debugging,
+    starts deparsing the query tree and degrades performance.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableDelayedHoldPortal
+  type: bool
+  default: 'true'
+  description: Whether to delay holding the portal until we know there is more data to be fetched.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableDollarInToScalarArrayOpExprConversion
+  type: bool
+  default: 'true'
+  description: Whether to enable conversion of $in with scalar array to OpExpr.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableDropInvalidIndexesOnReadOnly
+  type: bool
+  default: 'true'
+  description: Whether to enable dropping invalid indexes on read only database state.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableDuplicateFieldFix
+  type: bool
+  default: 'true'
+  description: Whether to enable fix for duplicate fields in addToSet.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableDynamicCursors
+  type: bool
+  default: 'false'
+  description: Whether or not to enable dynamic cursors for aggregation query rewrites.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableExplainScanIndexCosts
+  type: bool
+  default: 'true'
+  description: Whether to include index costs in explain output for index scans. requires enableextendedexplainplans
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableExplainScanNamespaceName
+  type: bool
+  default: 'true'
+  description: Whether to include namespace name in explain output for index scans. requires enableextendedexplainplans
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableExprLookupIndexPushdown
+  type: bool
+  default: 'true'
+  description: Whether to expr and lookup pushdown to the index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableExtendedExplainOnAnalyzeOff
+  type: bool
+  default: 'true'
+  description: Whether to enable logging extended explain on explain with analyze off.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableExtendedExplainPlans
+  type: bool
+  default: 'false'
+  description: Enables extended explain plans for queries. This will include additional information in
+    the explain plans.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enableExtendedIndexes
+  type: bool
+  default: 'false'
+  description: Whether to enable extended indexes feature.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableFailureOnParallelIndexArrays
+  type: bool
+  default: 'false'
+  description: Whether to fail when parallel arrays are indexed in composite indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableFindProjectionAfterOffset
+  type: bool
+  default: 'true'
+  description: Whether to enable pushing projection as a subquery after offset.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableGenerateNonExistsTerm
+  type: bool
+  default: 'true'
+  description: Enables generating the non exists term for new documents in a collection.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableGroupByCompoundIdIndexPushdown
+  type: bool
+  default: 'false'
+  description: Whether to enable compound document _id group-by decomposition for index pushdown.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableGroupSubqueryElimination
+  type: bool
+  default: 'true'
+  description: Whether to eliminate the subquery migration in $group by inlining bson_repath_and_build.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIdIndexCustomCostFunction
+  type: bool
+  default: 'true'
+  description: Whether to enable index terms that are value only.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIdIndexPushdownForQueryOp
+  type: bool
+  default: 'true'
+  description: Whether to enable index push down for _id index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIndexOnlyScan
+  type: bool
+  default: 'true'
+  description: Whether to enable index only scan for queries that can be satisfied by an index without
+    accessing the table.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIndexOnlyScanForCoveredAggregateTargets
+  type: bool
+  default: 'true'
+  description: Whether to enable index only scan for aggregate target-list expressions that reference
+    covered document paths.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIndexOnlyScanForFindProject
+  type: bool
+  default: 'false'
+  description: Whether or not to enable index only scan for find with project operations. Test GUC for
+    now since we need to support this with cursors properly.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableIndexOnlyScanForRangeMatch
+  type: bool
+  default: 'true'
+  description: Whether to enable index only scan for range-match qualifiers on covered index paths.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableIndexOnlyScanOnCost
+  type: bool
+  default: 'true'
+  description: Whether to enable index only scan on cost function or planner.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableLocalRetryTable
+  type: bool
+  default: 'true'
+  description: Whether to use a single local retry table instead of per-collection distributed retry tables
+    (After retirement move it to testing configs)
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableLookupIdJoinOptimizationOnCollation
+  type: bool
+  default: 'false'
+  description: Determines whether we can perform _id join opetimization on collation. It would be a customer
+    input confiriming that _id does not contain collation aware data types (i.e., UTF8 and DOCUMENT).
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableMultiIndexRumJoin
+  type: bool
+  default: 'false'
+  description: Whether or not to add the cursors on aggregation style queries.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableNativeColocation
+  type: bool
+  default: 'true'
+  description: Determines whether to turn on colocation of tables in a given collection database (and
+    disabled outside the database)
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableNewCountAggregates
+  type: bool
+  default: 'true'
+  description: Whether to enable new count aggregate optimizations.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableNewMinMaxAccumulators
+  type: bool
+  default: 'false'
+  description: Whether to enable new min and max aggregate optimizations.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableNewNamespaceValidation
+  type: bool
+  default: 'false'
+  description: Whether to enable new namespace validation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableNewWithExprAccumulators
+  type: bool
+  default: 'false'
+  description: Whether to enable new WithExpr aggregate optimizations for min, max, sum, avg, first, and
+    last accumulators.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableOnlyCollectionCacheInvalidateOnCollectionChanges
+  type: bool
+  default: 'true'
+  description: Whether to only invalidate collection cache on collection changes instead of invalidating
+    entire database cache.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableOrderByIdOnCostFunction
+  type: bool
+  default: 'false'
+  description: Whether to enable index terms that are value only.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableOrderByIndexTerm
+  type: bool
+  default: 'false'
+  description: Whether to enable order by index term feature.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableOrderedCompositeOperatorScan
+  type: bool
+  default: 'true'
+  description: Whether to enable using the single ordered scalar array operator scan for ordered indexes
+    which has skip-scan support enabled inherently.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableOrderedCostEstimator
+  type: bool
+  default: 'true'
+  description: Whether to enable the new ordered cost estimator for composite indexes. Requires enableCompositeIndexPlanner
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePartialMatchHasRecheck
+  type: bool
+  default: 'true'
+  description: Whether to enable partial match has recheck for queries that have partial index matches.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePerCollectionPlannerStatistics
+  type: bool
+  default: 'false'
+  description: Whether to enable per-collection planner statistics.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePlannerStatisticsNewCollections
+  type: bool
+  default: 'false'
+  description: Whether to enable custom planner statistics for any new collections.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePreImages
+  type: bool
+  default: 'false'
+  description: Whether to enable changestream preimages with the entire row logged in the WAL messages.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePrepareUnique
+  type: bool
+  default: 'false'
+  description: Whether to enable prepareUnique for coll mod.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enablePrimaryKeyCursorScan
+  type: bool
+  default: 'false'
+  description: Whether or not to enable primary key cursor scan for streaming cursors.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableRbacCompliantSchemas
+  type: bool
+  default: 'false'
+  description: Enables RBAC compliant schemas.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.enableRegexPrefixIndexBounds
+  type: bool
+  default: 'true'
+  description: Whether to enable the optimized regex prefix index bounds.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableRoleCrud
+  type: bool
+  default: 'false'
+  description: Enables role crud through the data plane.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableRolesAdminDBCheck
+  type: bool
+  default: 'true'
+  description: Enables db admin requirement for role CRUD APIs through the data plane.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableSchemaEnforcementForCSFLE
+  type: bool
+  default: 'true'
+  description: Whether or not to enable schema enforcement for CSFLE.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableSchemaValidation
+  type: bool
+  default: 'false'
+  description: Whether or not to support schema validation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableSkipDottedFieldIndexTerms
+  type: bool
+  default: 'true'
+  description: Whether to skip generating index terms for fields with dotted names (e.g. literal "a.b"
+    field).
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableSortGroupStage
+  type: bool
+  default: 'true'
+  description: Whether to enable the $sortGroup stage.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableSortPushToAccumulator
+  type: bool
+  default: 'false'
+  description: Whether to push sort order into accumulator in $sortGroup.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableStatementTimeout
+  type: bool
+  default: 'true'
+  description: Whether to enable per statement backend timeout override in the backend.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enableStreamingCursorDrainViaDestReceiver
+  type: bool
+  default: 'true'
+  description: Whether to use direct executor DestReceiver for streaming cursor drainage instead of SPI.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableTTLBatchObservability
+  type: bool
+  default: 'true'
+  description: Whether to calculate and emit TTL batch observability metrics.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableTTLDescSort
+  type: bool
+  default: 'false'
+  description: Whether or not to enable TTL descending sort on field.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.enableTTLJobsOnReadOnly
+  type: bool
+  default: 'false'
+  description: Enables TTL jobs on read-only nodes. This will override the default_transaction_readonly
+    on the TTL job only.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enableUniqueCompositeReducedCorrelatedTerms
+  type: bool
+  default: 'false'
+  description: Whether to enable reduced term generation for correlated composite paths for unique indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableUniqueReindex
+  type: bool
+  default: 'false'
+  description: Whether to enable unique reindex.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableUseForeignKeyLookupInline
+  type: bool
+  default: 'true'
+  description: Whether to use foreign key for lookup inline method.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableUserCrud
+  type: bool
+  default: 'true'
+  description: Enables user crud through the data plane.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enableUsernamePasswordConstraints
+  type: bool
+  default: 'true'
+  description: Determines whether username and password constraints are enabled.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableUsersAdminDBCheck
+  type: bool
+  default: 'false'
+  description: Enables db admin requirement for user CRUD APIs through the data plane.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableUsersInfoPrivileges
+  type: bool
+  default: 'true'
+  description: Determines whether the usersInfo command returns privileges.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableValueOnlyIndexTerms
+  type: bool
+  default: 'true'
+  description: Whether to enable index terms that are value only.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorCalculateDefaultSearchParam
+  type: bool
+  default: 'true'
+  description: Enables support for vector index default search parameter calculation
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorCompressionHalf
+  type: bool
+  default: 'true'
+  description: Enables support for vector index compression half
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorCompressionPQ
+  type: bool
+  default: 'true'
+  description: Enables support for vector index compression product quantization
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorHNSWIndex
+  type: bool
+  default: 'true'
+  description: Enables support for HNSW index type and query for vector search in bson documents index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorPreFilter
+  type: bool
+  default: 'true'
+  description: Enables support for vector pre-filtering feature for vector search in bson documents index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enableVectorPreFilterV2
+  type: bool
+  default: 'false'
+  description: Enables support for vector pre-filtering v2 feature for vector search in bson documents
+    index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enable_create_collection_on_insert
+  type: bool
+  default: 'true'
+  description: Create a collection when inserting into a non-existent collection
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enable_force_push_geonear_index
+  type: bool
+  default: 'true'
+  description: Enables ensuring that geonear queries are always pushed to the geospatial index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.enable_force_push_vector_index
+  type: bool
+  default: 'false'
+  description: Enables ensuring that vector index queries are always pushed to the vector index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.enable_large_unique_index_keys
+  type: bool
+  default: 'true'
+  description: Whether or not to enable large index keys on unique indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.failOnGroupIdDuplicate
+  type: bool
+  default: 'false'
+  description: Whether to fail when $group stage has duplicate _id.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.failOnNonEmptyGroupCountArg
+  type: bool
+  default: 'false'
+  description: Whether to fail when $count accumulator in $group has non-empty arguments.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.forceBitmapScanForLookup
+  type: bool
+  default: 'false'
+  description: Whether or not to force bitmap scan for lookup.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceCollStatsDataCollection
+  type: bool
+  default: 'false'
+  description: Whether to force fetching metadata during collstats operations.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceDisableSeqScan
+  type: bool
+  default: 'false'
+  description: Whether to force disable sequential type scans on the collection.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceGroupSubqueryElimination
+  type: bool
+  default: 'false'
+  description: Forces subquery elimination in $group even for sharded collections with non-constant _id.
+    For testing only.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceIndexOnlyScanIfAvailable
+  type: bool
+  default: 'false'
+  description: If an indexonlyscan is available, force use it in the plan.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceIndexScanForTTLTask
+  type: bool
+  default: 'true'
+  description: Whether to force Index Scan for TTL task by locally disabling Sequential Scan and Bitmap
+    Index Scan
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.forceIndexTermTruncation
+  type: bool
+  default: 'false'
+  description: Whether to force the feature for index term truncation
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceLocalExecutionShardQueries
+  type: bool
+  default: 'false'
+  description: Determines whether or not to force all shard queries to be executed locally on the shard.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceParallelScanIfAvailable
+  type: bool
+  default: 'false'
+  description: If a parallel plan is available, force use it in the plan.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceRunDiagnosticCommandInline
+  type: bool
+  default: 'false'
+  description: Whether or not to force running diagnostic commands in inline mode.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceUpdateIndexInline
+  type: bool
+  default: 'false'
+  description: Whether or not to force update index inline in the current node or go through the worker
+    route.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.forceUseIndexIfAvailable
+  type: bool
+  default: 'true'
+  description: Forces the query planner to push to the RUM index if it's applicable - do not pick the
+    index path purely based on cost.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.forceWildcardReducedTerm
+  type: bool
+  default: 'false'
+  description: Whether to force the feature for the wildcard reduced term generation
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.geo2dsphereSegmentMaxLength
+  type: real
+  default: '500'
+  description: Maximum segment length (in km) allowed for geospatial spherical queries. Set 0 if segmentation
+    needs to be disabled.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: '6372'
+- name: documentdb.geo2dsphereSegmentMaxVertices
+  type: int
+  default: '8'
+  description: Maximum segment vertices allowed for geospatial spherical queries. If sphereSegmentMaxLength
+    is 0 then this config has no effect overall.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: '32'
+- name: documentdb.indexBuildScheduleInSec
+  type: int
+  default: '2'
+  description: The index build cron-job schedule in seconds.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: '60'
+- name: documentdb.indexBuildsScheduledOnBgWorker
+  type: bool
+  default: 'false'
+  description: Whether to schedule index builds via background worker jobs.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.indexQueueEvictionIntervalInSec
+  type: int
+  default: '1200'
+  description: Interval in seconds for skippable build index requests to be evicted from the queue.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.indexTermLimitOverride
+  type: int
+  default: INT_MAX
+  description: Override for the index term truncation limit (primarily for tests).
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.index_term_compression_threshold
+  type: int
+  default: INT_MAX
+  description: The size in bytes above which index terms will be compressed.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '128'
+  max: INT_MAX
+- name: documentdb.inlineChangeStreamMatchStage
+  type: bool
+  default: 'true'
+  description: Determines whether to inline $match aggregation stage with  $changestreams
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.isNativeAuthEnabled
+  type: bool
+  default: 'true'
+  description: Determines whether native authentication is enabled.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.localhost_connection_string
+  type: string
+  default: host=localhost
+  description: Sets the hostname (and potentially other parameters except port number and database name)
+    when connecting back to itself for operations that needs to be done via a libpq connection.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.logRelationIndexesOrder
+  type: bool
+  default: 'false'
+  description: Whether to log the order of indexes in the relation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.logTTLProgressActivity
+  type: bool
+  default: 'false'
+  description: Whether to log activity done by a ttl purger. It's turned off by default to reduce noise.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.maxCursorFileCount
+  type: int
+  default: '5000'
+  description: Maximum number of cursor files allowed. set to 0 to disable cursor file limit.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.maxCursorIntermediateFileSizeMB
+  type: int
+  default: 4 * 1024
+  description: Maximum size of intermediate file for cursor.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.maxCustomCommandTimeoutLimit
+  type: int
+  default: (3600 * 3 * 1000)
+  description: The max allowed custom command limit in milliseconds.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.maxIndexBuildAttempts
+  type: int
+  default: '3'
+  description: The maximum number of attempts to build an index for a failed requests.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: SHRT_MAX
+- name: documentdb.maxIndexesPerCollection
+  type: int
+  default: '64'
+  description: Maximum allowed indexes for a given collection.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: '300'
+- name: documentdb.maxNumActiveUsersIndexBuilds
+  type: int
+  default: '2'
+  description: Max number of active users Index Builds that can run.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.maxSchemaValidatorSize
+  type: int
+  default: 10 * 1024
+  description: Maximum size of the schema validator.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '0'
+  max: 16 * 1024 * 1024
+- name: documentdb.maxTTLBatchSizeUnorderedIndex
+  type: int
+  default: '10000'
+  description: The max batch size for TTL deletes on non-ordered indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.maxTTLDeleteBatchSize
+  type: int
+  default: '1000'
+  description: The max number of delete operations permitted while deleting a batch of expired documents.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.maxUserLimit
+  type: int
+  default: '100'
+  description: The default number of users allowed.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: '500'
+- name: documentdb.maxWildcardIndexKeySize
+  type: int
+  default: '200'
+  description: GUC for the max wildcard index key size.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT32_MAX
+- name: documentdb.maxWorkerCursorSize
+  type: int
+  default: (16 * 1024 * 1024)
+  description: The maximum size a single cursor response page should be in a worker.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '1'
+  max: (16 * 1024 * 1024)
+- name: documentdb.maxWriteBatchSize
+  type: int
+  default: '25000'
+  description: The max number of write operations permitted in a write batch.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.max_non_ordered_term_scan_threshold
+  type: int
+  default: '500'
+  description: The maximum threshold for non-ordered term scans.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '-1'
+  max: INT_MAX
+- name: documentdb.multipleDollarPositionalNotAllowed
+  type: bool
+  default: 'true'
+  description: Determines whether to throw error when multiple $ positional operators are provided in
+    the same path e.g. 'a.b.$.c.$'
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.next_collection_id
+  type: int
+  default: '0'
+  description: Set the next collection id to use when creationing a collection.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.next_collection_index_id
+  type: int
+  default: '0'
+  description: Set the next collection index id to use when creating a collection index.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb.query_plan_cache_size
+  type: int
+  default: '100'
+  description: Set the size of the query plan cache
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: INT_MAX
+- name: documentdb.recreate_retry_table_on_shard
+  type: bool
+  default: 'false'
+  description: Gets whether or not to recreate a retry table to match the main table
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.removeMatchNamespaceFilters
+  type: bool
+  default: 'true'
+  description: Determines whether to remove $match aggregation stage filters on namespace when inlined
+    with $changestreams
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.repeatPurgeIndexesForTTLTask
+  type: bool
+  default: 'true'
+  description: Whether to keep deleting documents in batches until `TTLTaskMaxRunTimeInMS` is reach per
+    TTL task invocation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.rumFailOnLostPath
+  type: bool
+  default: 'false'
+  description: Whether or not to fail the query when a lost path is detected in RUM
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.rum_library_load_option
+  type: enum
+  default: RumLibraryLoadOption_RequireDocumentDBRum
+  description: Specifies the RUM library load option for DocumentDB.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.scramDefaultSaltLen
+  type: int
+  default: '28'
+  description: The default scram salt length.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: '64'
+- name: documentdb.sharding_max_chunks
+  type: int
+  default: '128'
+  description: Gets the maximum allowed number of chunks for a shard collection operation
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '1'
+  max: '8192'
+- name: documentdb.simulateRecoveryState
+  type: bool
+  default: 'false'
+  description: Simulates a database recovery state and throws an error for read-write operations.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.skipFailOnCollation
+  type: bool
+  default: 'false'
+  description: Determines whether we can skip failing when collation is specified but collation is not
+    supported
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.skipIndexCleanupOnFailure
+  type: bool
+  default: 'false'
+  description: Whether or not to skip index cleanup on failure.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.skipIndexCleanupOnReindex
+  type: bool
+  default: 'false'
+  description: Whether or not to skip index cleanup on reindex.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.skipRepeatDeleteForUnOrderedIndex
+  type: bool
+  default: 'true'
+  description: Whether to skip repeat delete and use a larger batch size for non-ordered TTL indexes.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.tdigestCompressionAccuracy
+  type: int
+  default: '1500'
+  description: Accuracy parameter of the t-digest compression.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+  min: '10'
+  max: '10000'
+- name: documentdb.test.internalDocumentSourceDensifyMaxMemoryBytes
+  type: int
+  default: (100 * 1024 * 1024)
+  description: This GUC is for testing only and it is mapped to external.internalDocumentSourceDensifyMaxMemoryBytes.Maximum
+    memory allowed for the generated documents in $densify stage.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '0'
+  max: (100 * 1024 * 1024)
+- name: documentdb.test.internalQueryMaxAllowedDensifyDocs
+  type: int
+  default: '500000'
+  description: This GUC is for testing only and it is mapped to external.internalQueryMaxAllowedDensifyDocs.Number
+    of maximum documents that can be generated using $densify stage.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+  min: '0'
+  max: INT32_MAX
+- name: documentdb.throwDeadlockOnCRUD
+  type: bool
+  default: 'false'
+  description: Determines whether a deadlock on CRUD operations should be thrown as an exception rather
+    than catching it and writing it to the operation result bson.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb.unifyPfeOnIndexInfo
+  type: bool
+  default: 'true'
+  description: Whether to unify partial filter expressions on index expressions.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.useFileBasedPersistedCursors
+  type: bool
+  default: 'false'
+  description: Whether or not to use file based persisted cursors.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.useIndexHintsForTTLTask
+  type: bool
+  default: 'true'
+  description: Whether to force ordered Index Scan via Index Hints for TTL task
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/background_job_configs.c
+- name: documentdb.useLocalExecutionShardQueries
+  type: bool
+  default: 'true'
+  description: Determines whether or not to push local shard queries to the shard directly.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/testing_configs.c
+- name: documentdb.useNewUniqueHashEqualityFunction
+  type: bool
+  default: 'true'
+  description: Whether to enable new unique hash equality implementation.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.usePgStatsLiveTuplesForCount
+  type: bool
+  default: 'true'
+  description: Whether to use pg_stat_all_tables live tuples for count in collStats.
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/feature_flag_configs.c
+- name: documentdb.vectorPreFilterIterativeScanMode
+  type: enum
+  default: VectorIterativeScan_RELAXED_ORDER
+  description: Set the iterative scan mode for vector pre-filtering. Relaxed order allows results to be
+    slightly out of order by distance, but provides better recall. Strict order ensures results are in
+    the exact order by distance
+  component: pg_documentdb
+  file: pg_documentdb/src/configs/system_configs.c
+- name: documentdb_core.bsonUseEJson
+  type: bool
+  default: 'false'
+  description: Determines whether the bson text is printed as extended Json. Used mainly for test.
+  component: pg_documentdb_core
+  file: pg_documentdb_core/src/bson_init.c
+- name: documentdb_core.enableCollation
+  type: bool
+  default: 'false'
+  description: Determines whether collation is supported.
+  component: pg_documentdb_core
+  file: pg_documentdb_core/src/bson_init.c
+- name: documentdb_core.enableWriteDocumentsInRepath
+  type: bool
+  default: 'false'
+  description: Whether to enable writing documents during bson repath and build.
+  component: pg_documentdb_core
+  file: pg_documentdb_core/src/bson_init.c
+- name: documentdb_core.skipBsonArrayTraverseOptimization
+  type: bool
+  default: 'false'
+  description: Determines whether to skip the optimization for traversing arrays in bson documents.
+  component: pg_documentdb_core
+  file: pg_documentdb_core/src/bson_init.c
+- name: documentdb_rum.data_page_posting_tree_size
+  type: int
+  default: '-1'
+  description: Test GUC that sets the data page size before splits.
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+  min: '-1'
+  max: INT_MAX
+- name: documentdb_rum.default_traverse_rum_page_only_on_backtrack
+  type: bool
+  default: 'false'
+  description: test only guc to only traverse vacuum pages on the backtrack path
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enableSkipIntermediateEntry
+  type: bool
+  default: 'true'
+  description: Sets whether or not to skip intermediate entries during scan
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_inject_page_split_incomplete
+  type: bool
+  default: 'false'
+  description: Test GUC - sets whether or not to enable injecting a failure in the middle of a page split
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_new_bulk_delete
+  type: bool
+  default: 'true'
+  description: Sets whether or not to the new bulk delete vacuum framework
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_new_bulk_delete_inline_data_pages
+  type: bool
+  default: 'false'
+  description: Sets whether or not to delete data pages inline in the new bulkdel framework
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_ordered_operator_scans
+  type: bool
+  default: 'true'
+  description: Sets whether or not to enable ordered operator scans
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_page_fill_factor
+  type: bool
+  default: 'true'
+  description: 'Sets whether or not to enable honoring the page fill factor '
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_parallel_index_build
+  type: bool
+  default: 'true'
+  description: Sets whether or not to enable parallel index build
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.enable_support_dead_index_items
+  type: bool
+  default: 'false'
+  description: Sets whether or not to enable support for handling LP_DEAD items
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.fix_incomplete_split
+  type: bool
+  default: 'true'
+  description: Sets whether or not to fix incomplete splits
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.forceRumOrderedIndexScan
+  type: bool
+  default: 'false'
+  description: Sets whether or not to force a run ordered index scan
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.parallel_index_workers_override
+  type: int
+  default: '-1'
+  description: 'Sets the number of parallel index workers to use (default: -1, meaning no override)'
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+  min: '-1'
+  max: INT_MAX
+- name: documentdb_rum.prune_rum_empty_pages
+  type: bool
+  default: 'false'
+  description: Sets whether or not to prune empty pages during vacuuming
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.rum_default_page_fill_factor
+  type: int
+  default: '50'
+  description: Sets the default page fill factor for RUM indexes
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+  min: '10'
+  max: '100'
+- name: documentdb_rum.rum_disable_fast_scan
+  type: bool
+  default: 'false'
+  description: Sets whether or not to disable fast scan
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.rum_fuzzy_search_limit
+  type: int
+  default: '0'
+  description: Sets the maximum allowed result for exact search by RUM.
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+  min: '0'
+  max: INT_MAX
+- name: documentdb_rum.rum_skip_retry_on_delete_page
+  type: bool
+  default: 'true'
+  description: Sets whether or not to skip retrying on delete pages during vacuuming
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.rum_throw_error_on_invalid_data_page
+  type: bool
+  default: 'false'
+  description: Sets whether or not to throw an error on invalid data page
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.skip_global_visibility_check_on_prune
+  type: bool
+  default: 'false'
+  description: test only guc to skip checking visibility on pruning pages
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.skip_reset_dead_page_flag
+  type: bool
+  default: 'false'
+  description: Sets whether or not to enable support for handling LP_DEAD items
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.track_incomplete_split
+  type: bool
+  default: 'true'
+  description: Sets whether or not to track incomplete splits
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+- name: documentdb_rum.vacuum_cycle_id_override
+  type: int
+  default: '-1'
+  description: test only override for setting the vacuum cycle id
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+  min: '-1'
+  max: UINT16_MAX
+- name: documentdb_rum.vacuum_skip_prune_posting_tree_pages
+  type: bool
+  default: 'false'
+  description: Sets whether or not to delete data pages inline in the new bulkdel framework
+  component: pg_documentdb_extended_rum
+  file: pg_documentdb_extended_rum/core/src/rumconfigs.c
+commands:
+- abortTransaction
+- aggregate
+- balancerStart
+- balancerStatus
+- balancerStop
+- buildInfo
+- collMod
+- collStats
+- commitTransaction
+- compact
+- connectionStatus
+- count
+- create
+- createIndex
+- createIndexes
+- createRole
+- createUser
+- currentOp
+- dbStats
+- delete
+- distinct
+- drop
+- dropDatabase
+- dropIndexes
+- dropRole
+- dropUser
+- endSessions
+- explain
+- find
+- findAndModify
+- getCmdLineOpts
+- getDefaultRWConcern
+- getLog
+- getMore
+- getParameter
+- getShardMap
+- hello
+- hostInfo
+- insert
+- isMaster
+- isdbgrid
+- killCursors
+- killOp
+- killSessions
+- listCollections
+- listCommands
+- listDatabases
+- listIndexes
+- listShards
+- logout
+- moveCollection
+- ping
+- prepareTransaction
+- reIndex
+- renameCollection
+- reshardCollection
+- rolesInfo
+- saslContinue
+- saslStart
+- shardCollection
+- unshardCollection
+- update
+- updateRole
+- updateUser
+- usersInfo
+- validate
+- whatsmyuri
+aggregation_stages:
+- $_internalInhibitOptimization
+- $addFields
+- $bucket
+- $bucketAuto
+- $changeStream
+- $collStats
+- $count
+- $currentOp
+- $densify
+- $documents
+- $facet
+- $fill
+- $geoNear
+- $graphLookup
+- $group
+- $indexStats
+- $inverseMatch
+- $limit
+- $listLocalSessions
+- $listSessions
+- $lookup
+- $lookupUnwind
+- $match
+- $merge
+- $out
+- $project
+- $redact
+- $replaceRoot
+- $replaceWith
+- $sample
+- $search
+- $searchMeta
+- $set
+- $setWindowFields
+- $skip
+- $sort
+- $sortByCount
+- $sortGroup
+- $unionWith
+- $unset
+- $unwind
+- $vectorSearch
+expression_operators:
+- name: $_bucketInternal
+  implemented: true
+- name: $abs
+  implemented: true
+- name: $accumulator
+  implemented: false
+- name: $acos
+  implemented: true
+- name: $acosh
+  implemented: true
+- name: $add
+  implemented: true
+- name: $addToSet
+  implemented: false
+- name: $allElementsTrue
+  implemented: true
+- name: $and
+  implemented: true
+- name: $anyElementTrue
+  implemented: true
+- name: $arrayElemAt
+  implemented: true
+- name: $arrayToObject
+  implemented: true
+- name: $asin
+  implemented: true
+- name: $asinh
+  implemented: true
+- name: $atan
+  implemented: true
+- name: $atan2
+  implemented: true
+- name: $atanh
+  implemented: true
+- name: $avg
+  implemented: true
+- name: $binarySize
+  implemented: true
+- name: $bitAnd
+  implemented: true
+- name: $bitNot
+  implemented: true
+- name: $bitOr
+  implemented: true
+- name: $bitXor
+  implemented: true
+- name: $bsonSize
+  implemented: true
+- name: $ceil
+  implemented: true
+- name: $cmp
+  implemented: true
+- name: $concat
+  implemented: true
+- name: $concatArrays
+  implemented: true
+- name: $cond
+  implemented: true
+- name: $const
+  implemented: true
+- name: $convert
+  implemented: true
+- name: $cos
+  implemented: true
+- name: $cosh
+  implemented: true
+- name: $dateAdd
+  implemented: true
+- name: $dateDiff
+  implemented: true
+- name: $dateFromParts
+  implemented: true
+- name: $dateFromString
+  implemented: true
+- name: $dateSubtract
+  implemented: true
+- name: $dateToParts
+  implemented: true
+- name: $dateToString
+  implemented: true
+- name: $dateTrunc
+  implemented: true
+- name: $dayOfMonth
+  implemented: true
+- name: $dayOfWeek
+  implemented: true
+- name: $dayOfYear
+  implemented: true
+- name: $degreesToRadians
+  implemented: true
+- name: $divide
+  implemented: true
+- name: $eq
+  implemented: true
+- name: $exp
+  implemented: true
+- name: $filter
+  implemented: true
+- name: $first
+  implemented: true
+- name: $firstN
+  implemented: true
+- name: $floor
+  implemented: true
+- name: $function
+  implemented: false
+- name: $getField
+  implemented: true
+- name: $gt
+  implemented: true
+- name: $gte
+  implemented: true
+- name: $hour
+  implemented: true
+- name: $ifNull
+  implemented: true
+- name: $in
+  implemented: true
+- name: $indexOfArray
+  implemented: true
+- name: $indexOfBytes
+  implemented: true
+- name: $indexOfCP
+  implemented: true
+- name: $isArray
+  implemented: true
+- name: $isNumber
+  implemented: true
+- name: $isoDayOfWeek
+  implemented: true
+- name: $isoWeek
+  implemented: true
+- name: $isoWeekYear
+  implemented: true
+- name: $last
+  implemented: true
+- name: $lastN
+  implemented: true
+- name: $let
+  implemented: true
+- name: $literal
+  implemented: true
+- name: $ln
+  implemented: true
+- name: $log
+  implemented: true
+- name: $log10
+  implemented: true
+- name: $lt
+  implemented: true
+- name: $lte
+  implemented: true
+- name: $ltrim
+  implemented: true
+- name: $makeArray
+  implemented: true
+- name: $map
+  implemented: true
+- name: $max
+  implemented: true
+- name: $maxN
+  implemented: true
+- name: $mergeObjects
+  implemented: true
+- name: $meta
+  implemented: true
+- name: $millisecond
+  implemented: true
+- name: $min
+  implemented: true
+- name: $minN
+  implemented: true
+- name: $minute
+  implemented: true
+- name: $mod
+  implemented: true
+- name: $month
+  implemented: true
+- name: $multiply
+  implemented: true
+- name: $ne
+  implemented: true
+- name: $not
+  implemented: true
+- name: $objectToArray
+  implemented: true
+- name: $or
+  implemented: true
+- name: $pow
+  implemented: true
+- name: $push
+  implemented: false
+- name: $radiansToDegrees
+  implemented: true
+- name: $rand
+  implemented: true
+- name: $range
+  implemented: true
+- name: $reduce
+  implemented: true
+- name: $regexFind
+  implemented: true
+- name: $regexFindAll
+  implemented: true
+- name: $regexMatch
+  implemented: true
+- name: $replaceAll
+  implemented: true
+- name: $replaceOne
+  implemented: true
+- name: $reverseArray
+  implemented: true
+- name: $round
+  implemented: true
+- name: $rtrim
+  implemented: true
+- name: $second
+  implemented: true
+- name: $setDifference
+  implemented: true
+- name: $setEquals
+  implemented: true
+- name: $setField
+  implemented: true
+- name: $setIntersection
+  implemented: true
+- name: $setIsSubset
+  implemented: true
+- name: $setUnion
+  implemented: true
+- name: $sin
+  implemented: true
+- name: $sinh
+  implemented: true
+- name: $size
+  implemented: true
+- name: $slice
+  implemented: true
+- name: $sortArray
+  implemented: true
+- name: $split
+  implemented: true
+- name: $sqrt
+  implemented: true
+- name: $stdDevPop
+  implemented: false
+- name: $stdDevSamp
+  implemented: false
+- name: $strLenBytes
+  implemented: true
+- name: $strLenCP
+  implemented: true
+- name: $strcasecmp
+  implemented: true
+- name: $substr
+  implemented: true
+- name: $substrBytes
+  implemented: true
+- name: $substrCP
+  implemented: true
+- name: $subtract
+  implemented: true
+- name: $sum
+  implemented: true
+- name: $switch
+  implemented: true
+- name: $tan
+  implemented: true
+- name: $tanh
+  implemented: true
+- name: $toBool
+  implemented: true
+- name: $toDate
+  implemented: true
+- name: $toDecimal
+  implemented: true
+- name: $toDouble
+  implemented: true
+- name: $toHashedIndexKey
+  implemented: true
+- name: $toInt
+  implemented: true
+- name: $toLong
+  implemented: true
+- name: $toLower
+  implemented: true
+- name: $toObjectId
+  implemented: true
+- name: $toString
+  implemented: true
+- name: $toUUID
+  implemented: true
+- name: $toUpper
+  implemented: true
+- name: $trim
+  implemented: true
+- name: $trunc
+  implemented: true
+- name: $tsIncrement
+  implemented: true
+- name: $tsSecond
+  implemented: true
+- name: $type
+  implemented: true
+- name: $unsetField
+  implemented: true
+- name: $week
+  implemented: true
+- name: $year
+  implemented: true
+- name: $zip
+  implemented: true
+gateway_env_vars: []
+sql_functions:
+- schema: __API_CATALOG_SCHEMA__
+  name: __EXTENSION_OBJECT__
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_aggregation_count
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_aggregation_distinct
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_aggregation_find
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_aggregation_getmore
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_aggregation_pipeline
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_array_agg_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_array_agg_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_avg_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_build_distinct_response
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_distinct_unwind
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_add_fields
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_all
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_bits_all_clear
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_bits_all_set
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_bits_any_clear
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_bits_any_set
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_elemmatch
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_eq
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_exists
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_expr
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_facet_project
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_geointersects
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_geowithin
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_gt
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_gte
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_in
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_json_schema
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_lt
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_lte
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_mod
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_ne
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_nin
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_project
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_project_find
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_project_geonear
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_regex
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_replace_root
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_set
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_size
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_type
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_unset
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_dollar_unwind
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_expression_get
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_expression_map
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_first_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_first_last_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_first_last_final_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_first_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_first_transition_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_firstn_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_firstn_lastn_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_firstn_lastn_final_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_firstn_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_firstn_transition_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_geonear_distance
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geography_compress
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geography_consistent
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geography_distance
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geography_options
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geometry_2d_compress
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geometry_2d_options
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geometry_consistent_2d
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_gist_geometry_distance_2d
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_last_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_last_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_last_transition_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_lastn_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_lastn_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_lastn_transition_on_sorted
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_lookup_unwind
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_max_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_max_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_min_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_min_max_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_min_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_object_agg_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_object_agg_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_orderby
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_query_match
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_sum_avg_combine
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_sum_avg_transition
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_sum_final
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_true_match
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_validate_geography
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: bson_validate_geometry
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: dollar_support
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: dollar_support_object_id
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_can_pre_consistent
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_compare
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_compare_partial
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_consistent
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_exclusion_pre_consistent
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_extract_query
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_pre_consistent
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_single_path_extract_value
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_single_path_options
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_wildcard_project_extract_value
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: gin_bson_wildcard_project_options
+  kind: function
+- schema: __API_CATALOG_SCHEMA__
+  name: query_match_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: __EXTENSION_OBJECT_V2__
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: apply_extension_data_table_upgrade
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: authenticate_with_scram_sha256
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_add_to_set_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_add_to_set_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_array_agg_minvtransition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_command_count_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_const_fill
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_count_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_count_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_count_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_covariance_pop_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_covariance_pop_samp_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_covariance_pop_samp_invtransition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_covariance_pop_samp_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_covariance_samp_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dense_rank
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_densify_full
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_densify_partition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_densify_range
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_derivative_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_document_add_score_field
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_document_number
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_add_fields
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_bucket_auto
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_eq
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_expr
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_extract_merge_filter
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_fullscan
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_gte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_index_hint
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_inverse_match
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_expression_eval_merge
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_extract_filter_array
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_extract_filter_expression
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_filter_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_join_filter
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lookup_project
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_lte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_add_object_id
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_documents
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_documents_at_path
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_fail_when_not_matched
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_filter_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_generate_object_id
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_handle_when_matched
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_merge_join
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_not_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_not_gte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_not_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_not_lte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_project
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_project_find
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_range
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_redact
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_replace_root
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_selectivity
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_dollar_text
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_exp_moving_avg
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_expression_get
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_expression_map
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_expression_partition_by_fields_get
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_expression_partition_get
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_extract_vector
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_first_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_first_transition_on_sorted
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_first_with_expr_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_first_with_expr_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_first_with_expr_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_firstn_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_firstn_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_firstn_transition_on_sorted
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_geonear_within_range
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_get_rewritten_sql
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_integral_derivative_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_integral_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_last_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_last_transition_on_sorted
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_last_with_expr_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_last_with_expr_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_last_with_expr_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_lastn_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_lastn_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_lastn_transition_on_sorted
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_linear_fill
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_locf_fill
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_max_with_expr_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_max_with_expr_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_maxminn_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_maxminn_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_maxn_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_merge_objects_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_merge_objects_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_merge_objects_transition_on_sorted
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_min_max_with_expr_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_min_with_expr_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_min_with_expr_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_minn_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_compare
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_compare_sort_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_eq
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_index
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_index_reverse
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_partition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_orderby_reverse
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_query_match
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_query_to_tsquery
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_rank
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_search_param
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_shift
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_stats_project
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_pop_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_pop_samp_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_pop_samp_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_pop_samp_winfunc_invtransition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_pop_winfunc_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_samp_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_std_dev_samp_winfunc_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_sum_avg_minvtransition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_sum_avg_with_expr_minvtransition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_sum_avg_with_expr_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_text_meta_qual
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_text_tsquery
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_to_bsonindexterm
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_unique_exclusion_index_equal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_unique_index_equal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_unique_shard_path_equal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_update_returned_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_all
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_bits_all_clear
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_bits_all_set
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_bits_any_clear
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_bits_any_set
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_elemmatch
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_eq
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_exists
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_gte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_in
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_lte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_mod
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_ne
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_nin
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_regex
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_size
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bson_value_dollar_type
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_compare
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_compare_btree
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_eq
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_gte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_lte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonindexterm_to_bson
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonquery_eq
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonquery_gt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonquery_gte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonquery_lt
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: bsonquery_lte
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: check_build_index_status
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: coll_stats_aggregation
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: coll_stats_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: collection_update_trigger
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: command_feature_counter_stats
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: command_node_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: create_indexes_non_concurrently
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: current_cursor_state
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: current_op_aggregation
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: current_op_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: cursor_directory_cleanup
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: cursor_state
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: cursor_tracker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: db_stats_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: delete_cursors
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: delete_expired_rows
+  kind: procedure
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: delete_expired_rows_background
+  kind: procedure
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: delete_one
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: delete_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: dollar_expr_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: empty_data_table
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: generate_unique_shard_document
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: get_bloat_stats_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_path_compare_partial
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_path_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_path_extract_query
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_path_extract_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_path_options
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_composite_rum_config
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_exclusion_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_exclusion_extract_query
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_exclusion_extract_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_exclusion_options
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_hashed_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_hashed_extract_query
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_hashed_extract_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_hashed_options
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_unique_shard_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_unique_shard_extract_query
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_unique_shard_extract_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_unique_shard_options
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: gin_bson_unique_shard_pre_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: index_stats_aggregation
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: index_stats_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: insert_one
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: insert_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: invalidate_collection_cache
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_bson_single_path_extract_tsvector
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_bson_text_path_options
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_extract_tsquery
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_ts_join_pos
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_tsquery_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_tsquery_distance
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_tsquery_pre_consistent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: rum_tsvector_config
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: scram_sha256_get_salt_and_iterations
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_add_double
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_add_double_array
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_array_percentiles
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_combine
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_deserial
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_percentile
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: tdigest_serial
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: trigger_validate_dbname
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: update_bson_document
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: update_one
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: update_worker
+  kind: function
+- schema: __API_SCHEMA_INTERNAL_V2__
+  name: validate_dbname
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: __EXTENSION_OBJECT__
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: aggregation_support
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: bson_distinct_array_agg_final
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: bson_distinct_array_agg_transition
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: bson_index_transform
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: bson_rum_composite_ordering
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: build_index_background
+  kind: procedure
+- schema: __API_SCHEMA_INTERNAL__
+  name: build_index_concurrently
+  kind: procedure
+- schema: __API_SCHEMA_INTERNAL__
+  name: check_build_index_status_internal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: create_builtin_id_index
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: create_indexes_background_internal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: drop_indexes_non_concurrently
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: ensure_valid_db_coll
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: get_shard_key_value
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: index_build_is_in_progress
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: index_spec_as_bson
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: index_spec_options_are_equivalent
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: record_id_index
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: reindex_index_background
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: reindex_indexes_background_internal
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: schedule_background_index_build_jobs
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: schema_validation_against_update
+  kind: function
+- schema: __API_SCHEMA_INTERNAL__
+  name: setup_index_queue_table
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: aggregate_cursor_first_page
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: binary_extended_version
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: binary_version
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: bulkWrite
+  kind: procedure
+- schema: __API_SCHEMA_V2__
+  name: coll_mod
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: coll_stats
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: compact
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: connection_status
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: create_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: create_collection_view
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: create_indexes_background
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: create_role
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: create_user
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: current_op_command
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: cursor_get_more
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: db_stats
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: delete
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: drop_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: drop_database
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: drop_role
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: drop_user
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: find_and_modify
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: find_cursor_first_page
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: insert
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: insert_bulk
+  kind: procedure
+- schema: __API_SCHEMA_V2__
+  name: insert_one
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: insert_txn_proc
+  kind: procedure
+- schema: __API_SCHEMA_V2__
+  name: kill_op
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: list_collections_cursor_first_page
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: list_databases
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: list_indexes_cursor_first_page
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: rename_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: reshard_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: roles_info
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: shard_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: unshard_collection
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: update
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: update_bulk
+  kind: procedure
+- schema: __API_SCHEMA_V2__
+  name: update_role
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: update_txn_proc
+  kind: procedure
+- schema: __API_SCHEMA_V2__
+  name: update_user
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: users_info
+  kind: function
+- schema: __API_SCHEMA_V2__
+  name: validate
+  kind: function
+- schema: __API_SCHEMA__
+  name: count_query
+  kind: function
+- schema: __API_SCHEMA__
+  name: distinct_query
+  kind: function
+- schema: __API_SCHEMA__
+  name: drop_indexes
+  kind: procedure
+- schema: __CORE_SCHEMA__
+  name: bson_build_document
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_compare
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_equal
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_from_bytea
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_get_value
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_get_value_text
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_gt
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_gte
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_hash_int4
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_hash_int8
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_hex_to_bson
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_in_range_interval
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_in_range_numeric
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_json_to_bson
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_lt
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_lte
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_not_equal
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_object_keys
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_operator_selectivity
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_repath_and_build
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_to_bson_hex
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_to_bsonsequence
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_to_bytea
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_to_json_string
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bson_unique_index_equal
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_compare
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_equal
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_gt
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_gte
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_lt
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_lte
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonquery_not_equal
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonsequence_from_bytea
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonsequence_get_bson
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: bsonsequence_to_bytea
+  kind: function
+- schema: __CORE_SCHEMA__
+  name: row_get_bson
+  kind: function
+- schema: documentdb_api_internal_admin
+  name: reindex_index_background
+  kind: function
+- schema: documentdb_api_internal_admin
+  name: reindex_indexes_background_internal
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: check_build_index_status
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: coll_stats_aggregation
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: coll_stats_worker
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: current_cursor_state
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: current_op_aggregation
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: current_op_worker
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: cursor_state
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: cursor_tracker
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: db_stats_worker
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: index_stats_aggregation
+  kind: function
+- schema: documentdb_api_internal_readonly
+  name: index_stats_worker
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: build_index_concurrently
+  kind: procedure
+- schema: documentdb_api_internal_readwrite
+  name: create_builtin_id_index
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: create_indexes_background_internal
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: create_indexes_non_concurrently
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: delete_one
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: delete_worker
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: drop_indexes_non_concurrently
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: empty_data_table
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: insert_one
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: insert_worker
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: record_id_index
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: update_one
+  kind: function
+- schema: documentdb_api_internal_readwrite
+  name: update_worker
+  kind: function
+- schema: documentdb_api_v2
+  name: aggregate_cursor_first_page
+  kind: function
+- schema: documentdb_api_v2
+  name: coll_stats
+  kind: function
+- schema: documentdb_api_v2
+  name: collection
+  kind: function
+- schema: documentdb_api_v2
+  name: count_query
+  kind: function
+- schema: documentdb_api_v2
+  name: create_collection
+  kind: function
+- schema: documentdb_api_v2
+  name: create_collection_view
+  kind: function
+- schema: documentdb_api_v2
+  name: create_indexes
+  kind: procedure
+- schema: documentdb_api_v2
+  name: create_indexes_background
+  kind: function
+- schema: documentdb_api_v2
+  name: current_op_command
+  kind: function
+- schema: documentdb_api_v2
+  name: cursor_get_more
+  kind: function
+- schema: documentdb_api_v2
+  name: db_stats
+  kind: function
+- schema: documentdb_api_v2
+  name: delete
+  kind: function
+- schema: documentdb_api_v2
+  name: distinct_query
+  kind: function
+- schema: documentdb_api_v2
+  name: drop_collection
+  kind: function
+- schema: documentdb_api_v2
+  name: drop_database
+  kind: function
+- schema: documentdb_api_v2
+  name: drop_indexes
+  kind: procedure
+- schema: documentdb_api_v2
+  name: find_and_modify
+  kind: function
+- schema: documentdb_api_v2
+  name: find_cursor_first_page
+  kind: function
+- schema: documentdb_api_v2
+  name: insert
+  kind: function
+- schema: documentdb_api_v2
+  name: insert_bulk
+  kind: procedure
+- schema: documentdb_api_v2
+  name: insert_one
+  kind: function
+- schema: documentdb_api_v2
+  name: list_collections_cursor_first_page
+  kind: function
+- schema: documentdb_api_v2
+  name: list_databases
+  kind: function
+- schema: documentdb_api_v2
+  name: list_indexes_cursor_first_page
+  kind: function
+- schema: documentdb_api_v2
+  name: rename_collection
+  kind: function
+- schema: documentdb_api_v2
+  name: update
+  kind: function
+- schema: documentdb_api_v2
+  name: update_bulk
+  kind: procedure
+- schema: documentdb_api_v2
+  name: validate
+  kind: function
