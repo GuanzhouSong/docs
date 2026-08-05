@@ -27,6 +27,23 @@ Collections with a `validator` are enforced on `insert`, `update`, `findAndModif
 
 When enabled, creating a unique ordered index on an existing collection no longer blocks concurrent writes for the duration of the build.
 
+### Defaults that changed in v0.114-0
+
+Six GUC defaults flipped from `off` to `on` in v0.114-0. If you relied on the previous
+behavior, set them back explicitly in `postgresql.conf`.
+
+| GUC | Default | Changed |
+| --- | --- | --- |
+| `documentdb.enableSchemaValidation` | `on` | Changed in v0.114-0 (previously `off`) |
+| `documentdb.enableBypassDocumentValidation` | `on` | Changed in v0.114-0 (previously `off`) |
+| `documentdb.enableCollModUnique` | `on` | Changed in v0.114-0 (previously `off`) |
+| `documentdb.enablePrepareUnique` | `on` | Changed in v0.114-0 (previously `off`) |
+| `documentdb.enableUniqueReindex` | `on` | Changed in v0.114-0 (previously `off`) |
+| `documentdb.EnableOperatorVariablesInLookup` | `on` | Changed in v0.114-0 (previously `off`) |
+
+See the [v0.114-0 release notes](/docs/release-notes/v0.114-0) for the full list of
+configuration changes in that release.
+
 ### Off-by-default feature flags
 
 These flags gate functionality that is otherwise silently unavailable — in each case the command still succeeds, so the symptom is a missing effect rather than an error.
