@@ -7,6 +7,8 @@ description: Learn how to install and run DocumentDB Local using Docker for loca
 
 DocumentDB Local provides a lightweight, containerized environment for developing and testing applications locally, including prototyping and integration testing.
 
+The examples below use the PostgreSQL 17 image from release **0.117.0**. Other PostgreSQL majors and image tags are listed in the [0.117 release](https://github.com/documentdb/documentdb/releases/tag/v0.117-0).
+
 ## Prerequisites
 
 - [Docker](https://www.docker.com/)
@@ -16,7 +18,7 @@ DocumentDB Local provides a lightweight, containerized environment for developin
 Get the Docker container image using `docker pull`.
 
 ```bash
-docker pull ghcr.io/documentdb/documentdb/documentdb-local:latest
+docker pull ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0
 
 ```
 
@@ -25,7 +27,7 @@ docker pull ghcr.io/documentdb/documentdb/documentdb-local:latest
 To run the container, use `docker run`. Afterwards, use `docker ps` to validate that the container is running.
 
 ```bash
-docker run -dt -p 10260:10260 --name docdb ghcr.io/documentdb/documentdb/documentdb-local:latest --username demo --password test
+docker run -dt -p 10260:10260 --name docdb ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 --username demo --password test
 
 
 docker ps
@@ -33,7 +35,7 @@ docker ps
 
 ```output
 CONTAINER ID   IMAGE                                                                             COMMAND                  CREATED         STATUS         PORTS                                                                                                      NAMES
-5aff734a3591   ghcr.io/documentdb/documentdb/documentdb-local:latest                             "/bin/bash -c '/home…"   5 seconds ago   Up 4 seconds   0.0.0.0:10260->10260/tcp, :::10260->10260/tcp                                                              docdb
+5aff734a3591   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0                        "/bin/bash -c '/home…"   5 seconds ago   Up 4 seconds   0.0.0.0:10260->10260/tcp, :::10260->10260/tcp                                                              docdb
 ```
 
 > This container writes its database to `/data`, which the image declares as a Docker volume. The command above mounts nothing there, so each `docker run` gets a fresh anonymous volume: the data does not survive re-creating the container, and the old volume is left behind on the host until you prune it. Mount a named volume - `-v documentdb-data:/data` - to persist it. See `--data-path` in the table below.
@@ -42,7 +44,7 @@ CONTAINER ID   IMAGE                                                            
 
 `docker ps` reports the container as `Up` well before DocumentDB can accept connections - PostgreSQL has to initialize, the extensions have to be set up, and the admin user has to be created first. Connecting too early fails with `MongoServerSelectionError` or `ECONNREFUSED`.
 
-The entrypoint prints a ready banner once the gateway is accepting connections. Wait for it before connecting:
+The entrypoint prints a ready banner after gateway startup and any requested data initialization finish. Wait for it before connecting:
 
 ```bash
 until docker logs docdb 2>&1 | grep -q "=== DocumentDB is ready ==="; do sleep 2; done
@@ -91,14 +93,14 @@ The following table summarizes the available Docker commands for configuring the
 | Specify the path to a certificate for securing traffic. | `--cert-path [value]` | Overrides `CERT_PATH` environment variable. | STRING | NA | PEM-format certificate. Must be set together with `--key-file` - setting only one of the two fails at startup. You need to mount this file into the container. For example, to set `/mycert.pem`, add this option to `docker run` command: `--mount type=bind,source=./mycert.pem,target=/mycert.pem`. |
 | Override default key with key in key file. | `--key-file [value]` | Overrides `KEY_FILE` environment variable. | STRING | NA | PEM-format private key. Must be set together with `--cert-path` - setting only one of the two fails at startup. You need to mount this file into the container. For example, to set `/mykey.key`, add this option to `docker run` command: `--mount type=bind,source=./mykey.key,target=/mykey.key` |
 | Set the TLS mode for client connections. | `--tlsMode [value]` | Overrides `TLS_MODE` environment variable | `disabled`, `allowTLS`, `requireTLS` | `allowTLS` | With `allowTLS` the gateway accepts both plain and TLS connections; `disabled` behaves the same way. `requireTLS` rejects plain connections, so every client must connect with `tls=true`. |
-| Enable initialization with built-in sample data. | `--init-data [value]` | Overrides `INIT_DATA` environment variable | `true`, `false` | `false` | Seeded once per data volume, on a fresh volume. Re-create the volume to seed again. |
-| Specify a directory of scripts for database initialization. | `--init-data-path [value]` | Overrides `INIT_DATA_PATH` environment variable | STRING | `/init_doc_db.d` | JavaScript files are executed in alphabetical order using `mongosh`, once per fresh data volume. Scripts should be idempotent - a failed run is not retried on restart. |
+| Enable initialization with built-in sample data. | `--init-data [value]` | Overrides `INIT_DATA` environment variable | `true`, `false` | `false` | Loads the `StoreData` dataset once per fresh data volume. Use a new, empty volume to seed again; see [Built-in sample data](#built-in-sample-data). |
+| Specify a directory of scripts for database initialization. | `--init-data-path [value]` | Overrides `INIT_DATA_PATH` environment variable | STRING | `/init_doc_db.d` | JavaScript files run alphabetically using `mongosh`, once per fresh data volume. Syntax or runtime errors abort initialization. An attempted script run is not repeated on restart, so fix the scripts and use a fresh volume to retry. |
 | Skip initialization with built-in sample data. | `--skip-init-data` | Overrides `SKIP_INIT_DATA` environment variable | `true`, `false` (`SKIP_INIT_DATA` only - the flag itself takes no value) | N/A | Legacy alias for `--init-data false`. Note that `SKIP_INIT_DATA=false` does the opposite of the flag: with `INIT_DATA` unset it enables the built-in sample data. Does not affect `--init-data-path`. |
 | Disable the use of extended RUM for indexes. | `--disable-extended-rum` | Overrides `DISABLE_EXTENDED_RUM` environment variable | N/A (takes no value) | N/A | Extended RUM is enabled by default. **Known issue:** this flag does not currently disable it - the container still starts with `documentdb_extended_rum` configured. |
 | Enable telemetry data. | `--enable-telemetry [value]` | Overrides `ENABLE_TELEMETRY` environment variable | `true`, `false` | `false` | **Known issue:** the value is validated at startup but no telemetry is currently emitted - the gateway's metrics and tracing exporters are disabled in this image, and an invalid value only serves to abort startup. |
 | Specify log verbosity. | `--log-level [value]` | Overrides `LOG_LEVEL` environment variable. | `quiet`, `error`, `warn`, `info`, `debug`, `trace` | `info` | **Known issue:** the value is validated at startup but does not currently change what the container logs. To change the gateway's own verbosity, set the `DOCUMENTDB_LOG_LEVEL` environment variable instead; it takes a tracing filter such as `info` or `debug` (`quiet` is not one of its values). |
 
-> `--skip-init-data` and `--disable-extended-rum` are the only options that take no value. Passing one anyway - for example `--disable-extended-rum false` - leaves the container spinning in its argument parser: it produces no logs, never becomes ready, and never exits.
+> `--skip-init-data` and `--disable-extended-rum` are the only options that take no value. Passing one anyway - for example `--disable-extended-rum false` - is rejected as an unexpected argument and the container exits.
 
 A complete `docker run` showing where each kind of option goes - Docker options before the image name, container arguments after it. This is the command from the **Running** section above with a persistent volume and sample data added, so remove that container first with `docker rm -f docdb`:
 
@@ -107,9 +109,27 @@ docker run -dt \
   -p 10260:10260 \
   -v documentdb-data:/data \
   --name docdb \
-  ghcr.io/documentdb/documentdb/documentdb-local:latest \
+  ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
   --username demo --password test --init-data true
 ```
+
+## Built-in sample data
+
+Release 0.117 replaces the earlier small `sampledb` seed with the complete `StoreData` dataset. Loading remains opt-in: add `--init-data true` to the container arguments, as in the example above.
+
+| Collection | Documents |
+|---|---:|
+| `StoreData.stores` | 41,505 |
+| `StoreData.ratings` | 2 |
+
+The bundled Extended JSON preserves BSON Binary, Date, and Timestamp values. After the ready banner, inspect the collections with `mongosh`:
+
+```javascript
+db.getSiblingDB("StoreData").stores.countDocuments({})   // 41505
+db.getSiblingDB("StoreData").ratings.countDocuments({})  // 2
+```
+
+Seeding remains one-shot per data volume. Previously seeded volumes are **not automatically migrated** to StoreData; use a new, empty volume when you want the new sample dataset. A direct loader rerun tolerates duplicate keys rather than duplicating documents. See the [versioned sample-data guide](https://github.com/documentdb/documentdb/tree/v0.117-0/documentdb-local/sample-data) for manual loader instructions.
 
 
 ## Feature support
@@ -145,7 +165,7 @@ docker run -dt \
   -v documentdb-data:/data \
   -e DOCUMENTDB_TLS_STATE_DIR=/data/tls \
   --name docdb \
-  ghcr.io/documentdb/documentdb/documentdb-local:latest \
+  ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
   --username demo --password test
 ```
 

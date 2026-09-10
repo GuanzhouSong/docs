@@ -1,11 +1,11 @@
 ---
 title: Configuration
-description: Server GUCs and gateway environment variables for configuring DocumentDB, including the defaults introduced in v0.114-0.
+description: Server GUCs and gateway environment variables for configuring DocumentDB, including the RUM library default introduced in v0.117-0.
 ---
 
 # Configuration
 
-DocumentDB is configured at two layers: the PostgreSQL extension (via GUCs in `postgresql.conf`) and the gateway process (via environment variables or a JSON config file). This page covers the most commonly adjusted settings, including behavior that changed in **v0.114-0**.
+DocumentDB is configured at two layers: the PostgreSQL extension (via GUCs in `postgresql.conf`) and the gateway process (via environment variables or a JSON config file). This page covers the most commonly adjusted settings, including the RUM library default introduced in **v0.117-0**.
 
 ## Extension GUCs
 
@@ -18,6 +18,16 @@ DocumentDB is configured at two layers: the PostgreSQL extension (via GUCs in `p
 | `documentdb.enableSchemaValidation` | `on` (since v0.114-0) | Enforces collection `$jsonSchema` validators on write operations. When `off`, a collection's validator is stored but not enforced. |
 
 Collections with a `validator` are enforced on `insert`, `update`, `findAndModify`, and aggregation output stages (`$merge`, `$out`) when the collection's `validationLevel` is not `off` and its `validationAction` is `error`. (A `validationAction` of `warn` is not rejected on the write path, and a write that sets `bypassDocumentValidation` skips enforcement — see `documentdb.enableBypassDocumentValidation`.) Prior to v0.114-0 enforcement was opt-in; it is now enabled by default.
+
+### RUM index library
+
+| GUC | Default | Description |
+| --- | --- | --- |
+| `documentdb.rum_library_load_option` | `require_documentdb_extended_rum` (since v0.117-0) | Requires the DocumentDB extended RUM library on every supported PostgreSQL major, not only PG18. Set this in `postgresql.conf` and restart PostgreSQL for a change to take effect. |
+
+The package setup wizard and container startup handle the required extension setup. For a manually configured PostgreSQL instance, create both `documentdb` and `documentdb_extended_rum`; `CREATE EXTENSION documentdb CASCADE` does not create `documentdb_extended_rum` automatically. Follow the [package setup guidance](https://documentdb.io/docs/getting-started/packages/) before creating indexes.
+
+Setting the option to `none` opts out of the library-load requirement.
 
 ### Non-blocking unique index builds
 
