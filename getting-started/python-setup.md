@@ -37,29 +37,52 @@ Learn how to set up and use DocumentDB with Python using the official MongoDB Py
    # Tag the image for convenience
    docker tag ghcr.io/documentdb/documentdb/documentdb-local:latest documentdb
 
+   read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+   read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+   printf '\n'
+   export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+
    # Run the container with your chosen username and password
-   docker run -dt -p 10260:10260 --name documentdb-container documentdb --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
-   docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest
+   if docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container documentdb \
+     --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" \
+     --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"; then
+     docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest
+   fi
    ```
    > **Note:** During the transition to the Linux Foundation, Docker images may still be hosted on Microsoft's container registry. These will be migrated to the new DocumentDB organization as the transition completes.
-   > **Note:** Replace `<YOUR_USERNAME>` and `<YOUR_PASSWORD>` with your desired credentials. Always set them explicitly: if you omit them the container starts with the built-in `default_user` / `Admin100`, which are public and let anyone who can reach the published port authenticate as the admin user.
+   > **Note:** The prompts export the credentials for the Python examples below. The guards reject empty values so the container cannot fall through to the public `default_user` / `Admin100` defaults. If you skip this Docker setup or open a new shell, set both environment variables before running Python.
    >
    > **Readiness Note:** `docker ps` reports the container as `Up` before DocumentDB can accept connections. Wait for the ready banner first: `until docker logs documentdb-container 2>&1 | grep -q "=== DocumentDB is ready ==="; do sleep 2; done`
    > 
-   > **Port Note:** Port `10260` is used by default in these instructions to avoid conflicts with other local database services. You can use port `27017` (the standard MongoDB port) or any other available port if you prefer. If you do, be sure to update the port number in both your `docker run` command and your connection string accordingly.
+   > **Network Note:** The example binds the gateway only to the local host. Expose it to other machines only after adding firewall rules and a certificate those clients can validate.
+   >
+   > **Port Note:** To use host port `27017` while leaving the gateway on its default container port, publish `-p 127.0.0.1:27017:10260` and connect to `localhost:27017`. To change the gateway's internal port too, add `--documentdb-port 27017` after the image name and publish that container port.
 
 ## Connecting to DocumentDB
 
 DocumentDB Local accepts TLS connections on the gateway port and requires authentication. Connect with the username and password you set when starting the container, and because the container uses a self-signed certificate, the simplest local setup skips certificate validation with `tlsAllowInvalidCertificates=true` (in production, provide the gateway certificate instead).
 
+The code reads the same `DOCUMENTDB_USERNAME` and `DOCUMENTDB_PASSWORD` values exported during Docker setup and raises a clear error if either is missing.
+
 1. Basic Connection
    ```python
+   import os
    import pymongo
-   import sys
 
-   # Create a MongoDB client and open a connection to DocumentDB
+   username = os.environ.get('DOCUMENTDB_USERNAME')
+   password = os.environ.get('DOCUMENTDB_PASSWORD')
+   if not username or not password:
+       raise RuntimeError(
+           'Set DOCUMENTDB_USERNAME and DOCUMENTDB_PASSWORD before connecting'
+       )
+
    client = pymongo.MongoClient(
-       'mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true'
+       'mongodb://localhost:10260/',
+       username=username,
+       password=password,
+       authSource='admin',
+       tls=True,
+       tlsAllowInvalidCertificates=True
    )
 
    # Specify the database to be used
@@ -69,11 +92,15 @@ DocumentDB Local accepts TLS connections on the gateway port and requires authen
    collection = db.sample_collection
    ```
 
-2. Connection with Authentication
+2. Connection with certificate validation
    ```python
-   # With username and password
    client = pymongo.MongoClient(
-       'mongodb://username:password@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true'
+       'mongodb://localhost:10260/',
+       username=username,
+       password=password,
+       authSource='admin',
+       tls=True,
+       tlsCAFile='/path/to/documentdb-cert.pem'
    )
    ```
 
@@ -81,7 +108,12 @@ DocumentDB Local accepts TLS connections on the gateway port and requires authen
    ```python
    # With additional options
    client = pymongo.MongoClient(
-       'mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true',
+       'mongodb://localhost:10260/',
+       username=username,
+       password=password,
+       authSource='admin',
+       tls=True,
+       tlsAllowInvalidCertificates=True,
        maxPoolSize=50,
        retryWrites=False,
        w='majority'
@@ -232,7 +264,6 @@ DocumentDB Local accepts TLS connections on the gateway port and requires authen
    from pymongo.errors import ConnectionFailure
 
    try:
-       client = pymongo.MongoClient(connection_string)
        client.admin.command('ping')
    except ConnectionFailure as e:
        print(f"Connection error: {e}")
@@ -254,7 +285,12 @@ DocumentDB Local accepts TLS connections on the gateway port and requires authen
    ```python
    # Configure connection pool
    client = pymongo.MongoClient(
-       connection_string,
+       'mongodb://localhost:10260/',
+       username=username,
+       password=password,
+       authSource='admin',
+       tls=True,
+       tlsAllowInvalidCertificates=True,
        maxPoolSize=50,
        waitQueueTimeoutMS=2000
    )
@@ -277,12 +313,26 @@ DocumentDB Local accepts TLS connections on the gateway port and requires authen
 ## Sample Application
 
 ```python
+import os
 from flask import Flask, jsonify
 from pymongo import MongoClient
-from datetime import datetime
 
 app = Flask(__name__)
-client = MongoClient('mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true')
+username = os.environ.get('DOCUMENTDB_USERNAME')
+password = os.environ.get('DOCUMENTDB_PASSWORD')
+if not username or not password:
+    raise RuntimeError(
+        'Set DOCUMENTDB_USERNAME and DOCUMENTDB_PASSWORD before starting the app'
+    )
+
+client = MongoClient(
+    'mongodb://localhost:10260/',
+    username=username,
+    password=password,
+    authSource='admin',
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 db = client.sample_database
 
 @app.route('/users', methods=['GET'])

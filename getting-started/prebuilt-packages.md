@@ -57,19 +57,32 @@ For PostgreSQL 17, select `documentdb-17` and `rhel9-postgresql17-documentdb` in
 
 The `ubuntu24.04-` and `rhel9-` filename prefixes disambiguate release assets; they are not part of the package name.
 
-### Extension only, from a single file
+### Extension-only installation
 
-If the host already has PostgreSQL and the PGDG extension dependencies (`postgresql-N-cron`, `-pgvector`, `-postgis-3`), the extension installs from one file — no gateway, no `documentdb-setup`:
+If the host already has PostgreSQL and the PGDG extension dependencies (`postgresql-N-cron`, `-pgvector`, `-postgis-3`), install the extension payload together with the administrator tools. This does not install the stand-alone gateway or `documentdb-setup`:
 
 ```bash
-sudo apt install ./ubuntu24.04-postgresql-18-documentdb_0.117-0_amd64.deb
+sudo apt install ./ubuntu24.04-documentdb-postgresql-tools_0.117.0_all.deb \
+                 ./ubuntu24.04-postgresql-18-documentdb_0.117-0_amd64.deb
 ```
 
-In 0.117, `documentdb_extended_rum` is required by default on every supported PostgreSQL major. For extension-only setup, configure the PostgreSQL instance with `documentdb-tune`, restart it, and run both extension-creation statements it prints. `CREATE EXTENSION documentdb CASCADE` does not create `documentdb_extended_rum` automatically.
+For PostgreSQL 17, use `ubuntu24.04-postgresql-17-documentdb_0.117-0_amd64.deb` instead. For arm64, replace `amd64` with `arm64` in the extension filename; the tools package is PostgreSQL- and architecture-independent.
+
+In 0.117, `documentdb_extended_rum` is required by default on every supported PostgreSQL major. For the default PostgreSQL 18 cluster on Ubuntu, configure it, restart it, and create both extensions in the `postgres` database:
+
+```bash
+sudo documentdb-tune --pg-version 18 --cluster main --yes
+sudo systemctl restart postgresql@18-main
+sudo -u postgres /usr/bin/psql --cluster 18/main -d postgres -v ON_ERROR_STOP=1 \
+  -c "CREATE EXTENSION IF NOT EXISTS documentdb CASCADE;" \
+  -c "CREATE EXTENSION IF NOT EXISTS documentdb_extended_rum CASCADE;"
+```
+
+Change `18` and `main` to the PostgreSQL major and cluster you are configuring. `documentdb-tune` prints the appropriate restart and connection commands for non-default instances. Both extension statements must run after the restart; `CREATE EXTENSION documentdb CASCADE` does not create `documentdb_extended_rum` automatically. See the [PostgreSQL package setup procedure](https://documentdb.io/docs/getting-started/packages/) for other instance layouts.
 
 ### Offline / air-gapped
 
-Release assets alone are not enough — DocumentDB also needs PostgreSQL, `pg_cron`, `pgvector` and PostGIS from PGDG. Stage the full dependency closure on a connected machine of the **same distro, release and architecture**, serve it to the target as a local repository, then install with one command. Commands: [Offline / air-gapped install](https://documentdb.io/docs/getting-started/packages/#offline-air-gapped-install).
+Release assets alone are not enough — DocumentDB also needs PostgreSQL, `pg_cron`, `pgvector` and PostGIS from PGDG. Stage the full dependency closure on a connected machine of the **same distro, release and architecture**, serve it to the target as a local repository, then install with one command. Commands: [Offline / air-gapped install](https://documentdb.io/docs/linux-packages/offline/).
 
 > Stage with `apt-cache depends --recurse` / `dnf download --alldeps`. `apt-get install --download-only` and a bare `dnf download --resolve` skip whatever is already installed on the staging machine; the bundle looks complete and the target dies with `Depends: adduser but it is not installable`.
 
@@ -92,7 +105,7 @@ mongosh localhost:10260 -u admin -p '<PASSWORD>' --authenticationMechanism SCRAM
 
 Add `--load-sample-data` to the setup command to load the optional `StoreData` dataset. This requires `mongosh`; see [Built-in sample data](https://documentdb.io/docs/documentdb-local/#built-in-sample-data) for the collection contents.
 
-> **Pre-GA:** In-place package upgrades from earlier releases are not supported yet. Use a clean host, or remove previous DocumentDB packages first.
+> **Pre-GA:** In-place package upgrades from earlier releases are not supported yet. Use a clean host or a newly created PostgreSQL instance. Removing packages preserves the existing PostgreSQL data directory and does not turn that instance into a clean installation; do not reset or reuse an adopted instance as an upgrade workaround.
 
 ## What each release publishes
 
@@ -122,12 +135,18 @@ Other targets — PostgreSQL 15/16, Debian 11/12/13, Ubuntu 22.04, and RHEL-comp
 ## Container image
 
 ```bash
-docker run -dt -p 10260:10260 --name documentdb-container \
+read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+printf '\n'
+export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+
+docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container \
   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
-  --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
+  --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" \
+  --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"
 ```
 
-Credentials must be set at create time or authentication will not work. Port `10260` avoids clashing with a local MongoDB; if you prefer `27017`, change both the `-p` flag and your connection string.
+The guards reject empty credentials so the container cannot fall through to its public defaults. The example binds only to the local host. To use host port `27017` while keeping the gateway on container port `10260`, publish `-p 127.0.0.1:27017:10260` and connect to `localhost:27017`. To change the internal gateway port too, add `--documentdb-port 27017`.
 
 `v0.117-0` publishes these multi-architecture tags (linux/amd64 and linux/arm64):
 
