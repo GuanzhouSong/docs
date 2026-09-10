@@ -27,17 +27,32 @@ docker pull ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0
 To run the container, use `docker run`. Afterwards, use `docker ps` to validate that the container is running.
 
 ```bash
-docker run -dt -p 10260:10260 --name docdb ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 --username demo --password test
+read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+printf '\n'
+export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+
+docker run -dt -p 127.0.0.1:10260:10260 --name docdb \
+  ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
+  --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" \
+  --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"
 
 
 docker ps
 ```
 
 ```output
-CONTAINER ID   IMAGE                                                                             COMMAND                  CREATED         STATUS         PORTS                                                                                                      NAMES
-5aff734a3591   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0                        "/bin/bash -c '/home…"   5 seconds ago   Up 4 seconds   0.0.0.0:10260->10260/tcp, :::10260->10260/tcp                                                              docdb
+CONTAINER ID   IMAGE                                                                             COMMAND                  CREATED         STATUS         PORTS                              NAMES
+5aff734a3591   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0                        "/bin/bash -c '/home…"   5 seconds ago   Up 4 seconds   127.0.0.1:10260->10260/tcp       docdb
 ```
 
+> The prompts export the credentials for the later client examples, and the guards
+> prevent an empty value from falling through to the image's public defaults. If you
+> open a new shell, set both variables again. The loopback binding makes the gateway
+> reachable only from this host. To allow remote clients, change it to
+> `-p 10260:10260` only after restricting the port with a firewall and configuring a
+> certificate that remote clients can validate.
+>
 > This container writes its database to `/data`, which the image declares as a Docker volume. The command above mounts nothing there, so each `docker run` gets a fresh anonymous volume: the data does not survive re-creating the container, and the old volume is left behind on the host until you prune it. Mount a named volume - `-v documentdb-data:/data` - to persist it. See `--data-path` in the table below.
 
 ### Wait for the container to be ready
@@ -59,7 +74,11 @@ First start typically takes a few tens of seconds. If the command has not return
 > The DocumentDB gateway endpoint is available on port `10260` by default. To access this with `mongosh`, run:
 
 ```bash
-mongosh "mongodb://demo:test@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true"
+mongosh localhost:10260 \
+  -u "${DOCUMENTDB_USERNAME:?Set DOCUMENTDB_USERNAME first}" \
+  -p "${DOCUMENTDB_PASSWORD:?Set DOCUMENTDB_PASSWORD first}" \
+  --authenticationMechanism SCRAM-SHA-256 \
+  --tls --tlsAllowInvalidCertificates
 ```
 
 ```output
@@ -83,7 +102,7 @@ The following table summarizes the available Docker commands for configuring the
 | Print the settings to stdout from the container | `--help`, `-h` | N/A | N/A | N/A | Display information on available configuration |
 | Specify the username for DocumentDB. | `--username [value]` | Overrides `USERNAME` environment variable | STRING | `default_user` | Username for DocumentDB. It may not be an internal DocumentDB role name, and it may not begin with `documentdb`, `citus`, `pg`, or `internal_role` (case-insensitive). The container rejects a reserved name and exits before starting anything. |
 | Specify the password for DocumentDB. | `--password [value]` | Overrides `PASSWORD` environment variable | STRING | `Admin100` | Password for DocumentDB. Always set this explicitly. The built-in default is well known, and anyone who can reach the published port can authenticate with it. |
-| The port of the DocumentDB endpoint. | `--documentdb-port [value]` | Overrides `DOCUMENTDB_PORT` environment variable | INT | `10260` | The port needs to be published - for example, using `-p 10260:10260`. |
+| The port of the DocumentDB endpoint. | `--documentdb-port [value]` | Overrides `DOCUMENTDB_PORT` environment variable | INT | `10260` | The port needs to be published. For local use, bind only to loopback - for example, `-p 127.0.0.1:10260:10260`. To use host port `27017` without changing the gateway port, publish `-p 127.0.0.1:27017:10260`; add `--documentdb-port 27017` only when changing the container-side port too. |
 | Specify a directory for data. | `--data-path [value]` | Overrides `DATA_PATH` environment variable. | STRING | `/data` | Data is not persisted unless you mount a volume at this path - for example, `-v documentdb-data:/data`. To use a different directory, set the mount and the flag together, keeping in mind that they go on opposite sides of the image name: `-v` / `--mount` is a `docker run` option and comes before it, `--data-path` is a container argument and comes after it. See the example below the table. |
 | Specify the owner. | `--owner [value]` | Overrides `OWNER` environment variable. | STRING | `documentdb` | The PostgreSQL role used to create the admin user. The cluster this image initializes has a single superuser role, `documentdb`, so leave this at the default: any other value fails with `role "<value>" does not exist` after PostgreSQL has already initialized, and the container exits. |
 | Specify whether to start the PostgreSQL server. | `--start-pg [value]` | Overrides `START_POSTGRESQL` environment variable | `true`, `false` | `true` | Set this to `false` only when you are pointing the gateway at a PostgreSQL server you run yourself; the container then expects one to be reachable on `--pg-port`. |
@@ -106,11 +125,13 @@ A complete `docker run` showing where each kind of option goes - Docker options 
 
 ```bash
 docker run -dt \
-  -p 10260:10260 \
+  -p 127.0.0.1:10260:10260 \
   -v documentdb-data:/data \
   --name docdb \
   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
-  --username demo --password test --init-data true
+  --username "${DOCUMENTDB_USERNAME:?Set DOCUMENTDB_USERNAME first}" \
+  --password "${DOCUMENTDB_PASSWORD:?Set DOCUMENTDB_PASSWORD first}" \
+  --init-data true
 ```
 
 ## Built-in sample data
@@ -161,12 +182,13 @@ To keep the same certificate across re-creating the container, pin the location 
 
 ```bash
 docker run -dt \
-  -p 10260:10260 \
+  -p 127.0.0.1:10260:10260 \
   -v documentdb-data:/data \
   -e DOCUMENTDB_TLS_STATE_DIR=/data/tls \
   --name docdb \
   ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
-  --username demo --password test
+  --username "${DOCUMENTDB_USERNAME:?Set DOCUMENTDB_USERNAME first}" \
+  --password "${DOCUMENTDB_PASSWORD:?Set DOCUMENTDB_PASSWORD first}"
 ```
 
 Point it inside the data directory rather than at a volume of its own: the entrypoint takes ownership of the data directory on every start, whereas a separate volume is created root-owned and the gateway - which runs as an unprivileged user - cannot write its key there. The trade-off is that the same step runs `chmod -R 750` over that directory, so from the second start onwards the private key is group-readable rather than owner-only, and it is included in any backup of the data volume.
@@ -174,7 +196,11 @@ Point it inside the data directory rather than at a volume of its own: the entry
 ### Use the certificate with mongosh
 
 ```bash
-mongosh localhost:10260 -u demo -p test --authenticationMechanism SCRAM-SHA-256 --tls --tlsCAFile ~/documentdb-cert.pem
+mongosh localhost:10260 \
+  -u "${DOCUMENTDB_USERNAME:?Set DOCUMENTDB_USERNAME first}" \
+  -p "${DOCUMENTDB_PASSWORD:?Set DOCUMENTDB_PASSWORD first}" \
+  --authenticationMechanism SCRAM-SHA-256 \
+  --tls --tlsCAFile ~/documentdb-cert.pem
 ```
 
 ```output

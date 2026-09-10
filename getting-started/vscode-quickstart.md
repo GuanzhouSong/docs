@@ -31,8 +31,13 @@ Get started with DocumentDB using the Visual Studio Code extension for a seamles
    ```bash
    docker pull ghcr.io/documentdb/documentdb/documentdb-local:latest
    docker tag ghcr.io/documentdb/documentdb/documentdb-local:latest documentdb
-   docker run -dt -p 10260:10260 --name documentdb-container documentdb --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
-   docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest || echo "No existing documentdb image to remove"
+   read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+   read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+   printf '\n'
+   export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+   if docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container documentdb --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"; then
+     docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest || echo "No existing documentdb image to remove"
+   fi
    ```
 
    **PowerShell**
@@ -40,15 +45,27 @@ Get started with DocumentDB using the Visual Studio Code extension for a seamles
    ```powershell
    docker pull ghcr.io/documentdb/documentdb/documentdb-local:latest
    docker tag ghcr.io/documentdb/documentdb/documentdb-local:latest documentdb
-   docker run -dt -p 10260:10260 --name documentdb-container documentdb --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
-   docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest; if ($LASTEXITCODE -ne 0) { echo "No existing documentdb image to remove" }
+   $env:DOCUMENTDB_USERNAME = Read-Host 'DocumentDB username'
+   $securePassword = Read-Host 'DocumentDB password' -AsSecureString
+   $env:DOCUMENTDB_PASSWORD = [System.Net.NetworkCredential]::new('', $securePassword).Password
+   if ([string]::IsNullOrWhiteSpace($env:DOCUMENTDB_USERNAME) -or [string]::IsNullOrWhiteSpace($env:DOCUMENTDB_PASSWORD)) {
+       throw 'DocumentDB credentials cannot be empty'
+   } else {
+       docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container documentdb --username "$env:DOCUMENTDB_USERNAME" --password "$env:DOCUMENTDB_PASSWORD"
+       if ($LASTEXITCODE -eq 0) {
+           docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest
+           if ($LASTEXITCODE -ne 0) { echo "No existing documentdb image to remove" }
+       }
+   }
    ```
 
    > **Note:** During the transition to the Linux Foundation, Docker images may still be hosted on Microsoft's container registry. These will be migrated to the new DocumentDB organization as the transition completes.
    >
-   > **Note:** Replace `<YOUR_USERNAME>` and `<YOUR_PASSWORD>` with your own credentials. If you omit `--username`/`--password` the container falls back to the built-in `default_user` / `Admin100` — these are public, so anyone who can reach the published port can authenticate as admin. Always set your own.
+   > **Note:** Both versions prompt for credentials and reject empty values so the container cannot fall through to the public `default_user` / `Admin100` defaults. Enter the same values when the extension asks for the local connection credentials.
    >
-   > **Port Note:** Port `10260` is used by default in these instructions to avoid conflicts with other local database services. You can use port `27017` (the standard MongoDB port) or any other available port if you prefer. If you do, be sure to update the port number in both your `docker run` command and your connection string accordingly.
+   > **Network Note:** The example binds the gateway only to the local host. Expose it to other machines only after adding firewall rules and a certificate those clients can validate.
+   >
+   > **Port Note:** To use host port `27017` while leaving the gateway on its default container port, publish `-p 127.0.0.1:27017:10260` and enter `27017` in the extension. To change the gateway's internal port too, add `--documentdb-port 27017` after the image name and publish that container port.
 
 2. Connecting to your database
    - Locate and select the DocumentDB icon in the primary VS Code sidebar on the left-hand side.

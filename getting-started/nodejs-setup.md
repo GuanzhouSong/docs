@@ -26,17 +26,27 @@ Before connecting from Node.js, make sure you have a running DocumentDB instance
    # Tag the image for convenience
    docker tag ghcr.io/documentdb/documentdb/documentdb-local:latest documentdb
 
+   read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+   read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+   printf '\n'
+   export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+
    # Run the container with your chosen username and password
-   docker run -dt -p 10260:10260 --name documentdb-container documentdb --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
-   docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest
+   if docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container documentdb \
+     --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" \
+     --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"; then
+     docker image rm -f ghcr.io/documentdb/documentdb/documentdb-local:latest
+   fi
    ```
 > **Note:** During the transition to the Linux Foundation, Docker images may still be hosted on Microsoft's container registry. These will be migrated to the new DocumentDB organization as the transition completes.
 >
-> **Note:** Replace `<YOUR_USERNAME>` and `<YOUR_PASSWORD>` with your desired credentials. Always set them explicitly: if you omit them the container starts with the built-in `default_user` / `Admin100`, which are public and let anyone who can reach the published port authenticate as the admin user.
+> **Note:** The prompts export the credentials for the Node.js example below. The guards reject empty values so the container cannot fall through to the public `default_user` / `Admin100` defaults. If you skip this Docker setup or open a new shell, set both environment variables before running Node.js.
 >
 > **Readiness Note:** `docker ps` reports the container as `Up` before DocumentDB can accept connections. Wait for the ready banner first: `until docker logs documentdb-container 2>&1 | grep -q "=== DocumentDB is ready ==="; do sleep 2; done`
 >
-> **Port Note:** Port `10260` is used by default in these instructions to avoid conflicts with other local database services. You can use port `27017` (the standard MongoDB port) or any other available port if you prefer. If you do, be sure to update the port number in both your `docker run` command and your connection string accordingly.
+> **Network Note:** The example binds the gateway only to the local host. Expose it to other machines only after adding firewall rules and a certificate those clients can validate.
+>
+> **Port Note:** To use host port `27017` while leaving the gateway on its default container port, publish `-p 127.0.0.1:27017:10260` and connect to `localhost:27017`. To change the gateway's internal port too, add `--documentdb-port 27017` after the image name and publish that container port.
 
 ## Installation
 
@@ -56,17 +66,29 @@ Before connecting from Node.js, make sure you have a running DocumentDB instance
 
 DocumentDB Local accepts TLS connections on the gateway port and requires authentication. Connect with the username and password you set when starting the container, and because the container uses a self-signed certificate, the simplest local setup skips certificate validation with `tlsAllowInvalidCertificates=true` (in production, provide the gateway certificate instead).
 
+The code reads the same `DOCUMENTDB_USERNAME` and `DOCUMENTDB_PASSWORD` values exported during Docker setup and raises a clear error if either is missing.
+
 ```javascript
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true';
-const client = new MongoClient(uri);
+const username = process.env.DOCUMENTDB_USERNAME;
+const password = process.env.DOCUMENTDB_PASSWORD;
+if (!username || !password) {
+  throw new Error('Set DOCUMENTDB_USERNAME and DOCUMENTDB_PASSWORD before connecting');
+}
+
+const client = new MongoClient(
+  'mongodb://localhost:10260/?authSource=admin&tls=true&tlsAllowInvalidCertificates=true&directConnection=true',
+  {
+    auth: { username, password },
+  },
+);
 
 async function main() {
   await client.connect();
   const db = client.db('your_database');
   console.log('connected');
-  return db;
+  await client.close();
 }
 
 main().catch((error) => {
@@ -77,7 +99,8 @@ main().catch((error) => {
 
 ## Basic Operations
 
-The operations below all run inside `main()`, after `const db = client.db(...)` above.
+Replace the earlier `main()` function and its call with the example below. The
+operations all run inside `main()`, after `const db = client.db(...)`.
 `await` is only valid inside an `async` function, and `db` only exists in that scope —
 running these at the top level of a file gives `ReferenceError: db is not defined`.
 
@@ -113,7 +136,7 @@ main().catch((error) => {
 Aggregation pipelines, vector search, geospatial queries and change streams use the
 same syntax as the MongoDB shell. See the
 [Mongo Shell Quick Start](https://documentdb.io/docs/getting-started/mongo-shell-quickstart/)
-for worked examples, and the [API reference](https://documentdb.io/docs/api-reference/)
+for worked examples, and the [API reference](https://documentdb.io/docs/reference/)
 for the supported operator set.
 
 ## Next Steps

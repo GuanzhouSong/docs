@@ -24,13 +24,22 @@ docker pull ghcr.io/documentdb/documentdb/documentdb-local:latest
 # Tag the image for convenience
 docker tag ghcr.io/documentdb/documentdb/documentdb-local:latest documentdb
 
+read -r -p 'DocumentDB username: ' DOCUMENTDB_USERNAME
+read -r -s -p 'DocumentDB password: ' DOCUMENTDB_PASSWORD
+printf '\n'
+export DOCUMENTDB_USERNAME DOCUMENTDB_PASSWORD
+
 # Run the container with your chosen username and password
-docker run -dt -p 10260:10260 --name documentdb-container documentdb --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
+docker run -dt -p 127.0.0.1:10260:10260 --name documentdb-container documentdb \
+  --username "${DOCUMENTDB_USERNAME:?DocumentDB username cannot be empty}" \
+  --password "${DOCUMENTDB_PASSWORD:?DocumentDB password cannot be empty}"
 ```
 
-> **Note:** Replace `<YOUR_USERNAME>` and `<YOUR_PASSWORD>` with your desired credentials. Always set them explicitly: if you omit them the container starts with the built-in `default_user` / `Admin100`, which are public and let anyone who can reach the published port authenticate as the admin user.
+> **Note:** The prompts export the credentials for the `mongosh` command below. The guards reject empty values so the container cannot fall through to the public `default_user` / `Admin100` defaults. If you open a new shell, set both environment variables again.
 >
-> **Port note:** Port `10260` is used by default to avoid conflicts with other local database services. You can use port `27017` (the standard MongoDB port) or any other available port — update the port in the `docker run` command and your connection string accordingly.
+> **Network note:** The example binds the gateway only to the local host. Expose it to other machines only after adding firewall rules and a certificate those clients can validate.
+>
+> **Port note:** To use host port `27017` while leaving the gateway on its default container port, publish `-p 127.0.0.1:27017:10260` and connect to `localhost:27017`. To change the gateway's internal port too, add `--documentdb-port 27017` after the image name and publish that container port.
 
 Confirm the container is running:
 
@@ -51,7 +60,11 @@ If this has not returned after a couple of minutes, the container probably exite
 DocumentDB Local accepts TLS connections on the gateway port and requires authentication. The container generates a self-signed certificate on first start and reuses it thereafter, so the simplest local connection skips certificate validation with `tlsAllowInvalidCertificates=true`.
 
 ```bash
-mongosh "mongodb://<YOUR_USERNAME>:<YOUR_PASSWORD>@localhost:10260/?tls=true&tlsAllowInvalidCertificates=true"
+mongosh localhost:10260 \
+  -u "${DOCUMENTDB_USERNAME:?Set DOCUMENTDB_USERNAME first}" \
+  -p "${DOCUMENTDB_PASSWORD:?Set DOCUMENTDB_PASSWORD first}" \
+  --authenticationMechanism SCRAM-SHA-256 \
+  --tls --tlsAllowInvalidCertificates
 ```
 
 For instructions on installing the generated certificate so you can validate it normally, see [DocumentDB Local](https://documentdb.io/docs/documentdb-local/).
