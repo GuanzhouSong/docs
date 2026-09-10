@@ -7,12 +7,15 @@ description: Get started with DocumentDB using the Visual Studio Code extension 
 
 Get started with DocumentDB using the Visual Studio Code extension for a seamless development experience.
 
+The extension can set up a local DocumentDB instance for you: it pulls the official image, starts the container, waits until the database accepts connections, and saves the connection. It never installs Docker or elevates privileges.
+
 ## Prerequisites
 
 - Visual Studio Code installed
-- Docker Desktop installed and running
+- Docker Desktop or Docker Engine installed and running, configured for Linux containers
 - Basic familiarity with document databases
-- Git installed (for cloning the repository)
+
+Docker must be reachable from the environment VS Code is running in. If you work in WSL, a dev container, an SSH remote, or Codespaces, Docker needs to be available there rather than only on your host machine. The setup wizard runs a readiness check and explains what to fix if it cannot reach Docker.
 
 ## Installing the Extension
 
@@ -22,7 +25,38 @@ Get started with DocumentDB using the Visual Studio Code extension for a seamles
 4. Click Install
 5. Reload VS Code if prompted
 
-## Setting Up Your First Database
+You can also install it from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-documentdb).
+
+## Set Up DocumentDB Local
+
+This is the fastest way to get a database running. The wizard handles the container, the port, and the credentials, so you do not run any Docker commands yourself.
+
+1. Open the setup wizard using any of these:
+   - Select the DocumentDB icon in the primary sidebar, expand **Your own DocumentDB** in the Connections view, and select **Set up DocumentDB Local**.
+   - Run **DocumentDB: Set up DocumentDB Local** from the Command Palette (Ctrl+Shift+P or Cmd+Shift+P).
+   - Paste `vscode://ms-azuretools.vscode-documentdb/local` into your browser address bar and allow VS Code to open the link. This requires extension version 0.10.1 or later.
+
+2. On the **Introduction** step, select **Continue**.
+
+   > **Note:** Nothing is downloaded or created on your machine until you start the instance in the next step.
+
+3. On the **Configure** step, review the defaults and select **Start DocumentDB Local**.
+
+   The defaults give you an available port (starting at `10260`), generated credentials, the `latest` official image, and optional sample data. Expand the advanced options to set the port, the image tag, or the credentials yourself, or to skip the sample data.
+
+4. Wait for setup to finish. The extension pulls the image if needed, creates a container named `vscode-documentdb-local` with a persistent volume, starts it, and waits until the database accepts connections.
+
+5. Select **Open Connection** to reveal the saved connection in the Connections view, then expand it to browse databases and collections.
+
+If you keep the sample data option, a `sampledb` database is created with `users`, `products`, `orders`, and `analytics` collections, so you have something to query straight away.
+
+### Managing the Instance
+
+Right-click the DocumentDB Local entry in the Connections view to **Start**, **Stop**, **Restart**, or **Delete Container**, and to **Copy Connection String**, **Copy Password**, or **View Logs**. Stopping and starting preserves your data. Deleting the container also removes its data volume and the generated credentials, permanently.
+
+## Alternative: Connect to a Container You Started Yourself
+
+Use this if you already run DocumentDB Local outside VS Code, or you want to manage the container yourself.
 
 1. Creating a new DocumentDB instance
 
@@ -76,12 +110,13 @@ Get started with DocumentDB using the Visual Studio Code extension for a seamles
      - **Note:** TLS/SSL can be enabled, but this walkthrough skips those steps for simplicity.
      - A new DocumentDB Local entry will be added and listed in your DocumentDB Connections area.
 
-3. Creating your first database and collection
-   - Click on the drop-down next to your local connection and select "Create Database..."
-   - Enter database name and confirm
-   - Click on the drop-down next to your created database and select "Create Collection..."
-   - Enter collection name and confirm
-   - Repeat for every database and collection you wish to create under your connection
+## Creating Databases and Collections
+
+1. Click on the drop-down next to your connection and select "Create Database..."
+2. Enter database name and confirm
+3. Click on the drop-down next to your created database and select "Create Collection..."
+4. Enter collection name and confirm
+5. Repeat for every database and collection you wish to create under your connection
 
 ## Working with Documents
 
@@ -116,14 +151,22 @@ Get started with DocumentDB using the Visual Studio Code extension for a seamles
 
 ## Debugging and Troubleshooting
 
-1. Common issues and solutions
+1. The browser link does not open setup
 
-2. Using the extension logs
+   Confirm the extension is installed and up to date, then run **DocumentDB: Set up DocumentDB Local** from the Command Palette instead. The deep link requires version 0.10.1 or later.
 
-3. Getting support
+2. Setup reports that Docker is not reachable
+
+   The wizard names the specific problem, such as Docker not running, or Docker configured for Windows containers rather than Linux containers. Fix what it reports and select **Continue setup**. Nothing has been created on your machine at that point.
+
+3. Using the extension logs
+
+   Right-click the DocumentDB Local entry in the Connections view and select **View Logs** to follow the container's output. Extension logs are in the Output panel under the DocumentDB channel.
+
+4. Getting support
    - Visit our [GitHub repository](https://github.com/microsoft/vscode-documentdb)
    - Join the community on [Discord](https://discord.gg/vH7bYu524D)
-   - Check documentation
+   - Read the [extension user manual](https://microsoft.github.io/vscode-documentdb/user-manual/local-quick-start)
 
 ## Next Steps
 
