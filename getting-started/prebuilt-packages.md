@@ -5,7 +5,7 @@ description: Install the complete DocumentDB stack with a setup wizard, or choos
 
 # Pre-built Packages
 
-Install a complete MongoDB-compatible service, or add only the components you need to PostgreSQL you manage. Since v0.116, DocumentDB's packages include a setup wizard, administrator tools, and systemd integration.
+Install a complete MongoDB-compatible service, or add only the components you need to a PostgreSQL instance you manage. Since v0.116, DocumentDB's packages include a setup wizard, administrator tools, and systemd integration.
 
 Get first-party packages from [documentdb.io](https://documentdb.io/packages), extension packages from [PGDG](#pgdg-extension-packages), or [build packages for another target](#community-builds) with the provided scripts.
 
@@ -14,7 +14,7 @@ Get first-party packages from [documentdb.io](https://documentdb.io/packages), e
 | You want | Installation |
 | --- | --- |
 | A working DocumentDB instance with minimal setup | **[Stand-alone stack](#set-up-and-connect), recommended:** install `documentdb` and run the wizard. |
-| MongoDB-compatible access to PostgreSQL you manage | [Extension + gateway](#add-a-gateway): configure the components separately and retain your PostgreSQL service lifecycle. |
+| MongoDB-compatible access to a PostgreSQL instance you manage | [Extension + gateway](#add-a-gateway): configure the components separately and retain your PostgreSQL service lifecycle. |
 | DocumentDB through SQL, without a gateway | [Extension only](#extension-only-installation): install the extension and optional administrator tools. |
 
 ## First-party packages
@@ -86,7 +86,7 @@ Inspect state with `sudo documentdb-setup --pg-version 18 --status`. On systemd,
 
 ## What each release publishes
 
-`N` is the PostgreSQL major. The package manager installs the dependencies of your selected package.
+`N` is the PostgreSQL major version. The package manager installs the dependencies of your selected package.
 
 | Package | Purpose |
 | --- | --- |
@@ -116,7 +116,7 @@ sudo -u postgres /usr/bin/psql --cluster 18/main -d postgres -v ON_ERROR_STOP=1 
   -c "CREATE EXTENSION IF NOT EXISTS documentdb_extended_rum CASCADE;"
 ```
 
-In 0.117, both extension statements are required after the restart; `CASCADE` does not create `documentdb_extended_rum`. Adjust the major and cluster name for your instance. For other layouts, follow the restart and connection commands printed by `documentdb-tune`.
+In v0.117, both extension statements are required after the restart; `CASCADE` does not create `documentdb_extended_rum`. Adjust the major and cluster name for your instance. For other layouts, follow the restart and connection commands printed by `documentdb-tune`.
 
 For a **new** Debian/Ubuntu cluster, `sudo documentdb-createcluster 18 docdb --start` combines cluster creation, tuning, startup, and extension creation. Choose a cluster name that does not already exist.
 
@@ -140,7 +140,7 @@ DocumentDB is also included in the **PostgreSQL Global Development Group (PGDG) 
 
 For example, as of **2026-09-10**, PGDG publishes DocumentDB **0.116** for Debian 13 (`trixie-pgdg`), PostgreSQL **15-18**, on **amd64 and arm64**. Versions and targets differ from first-party releases; consult the [PGDG package pool](https://apt.postgresql.org/pub/repos/apt/pool/main/d/documentdb/).
 
-For a new Debian 13 installation, follow the [PGDG repository setup instructions](https://www.postgresql.org/download/linux/debian/#apt), then inspect the candidate for your chosen PostgreSQL major:
+For a new Debian 13 installation, follow the [PGDG repository setup instructions](https://www.postgresql.org/download/linux/debian/#apt), then inspect the candidate for your chosen PostgreSQL major version:
 
 ```bash
 sudo apt update
@@ -157,7 +157,7 @@ Configure PostgreSQL and create the extensions for that packaged version separat
 
 ## Community builds
 
-Can't find a package for your target? The supplied scripts build DEB or RPM packages with Docker; select the distribution and PostgreSQL major rather than writing packaging files yourself.
+No package for your target? The supplied scripts build DEB or RPM packages with Docker; select the distribution and PostgreSQL major version rather than writing packaging files yourself.
 
 Use a Linux build environment with Git, Docker, Bash 4+, and GNU utilities, on the target architecture. For example, build the extension for Debian 12 and PostgreSQL 18:
 
@@ -188,7 +188,7 @@ Use release assets when you need an exact first-party version rather than a repo
 gh release download v0.117-0 -R documentdb/documentdb -D pkgs && cd pkgs && sha256sum -c SHA256SUMS
 ```
 
-This downloads both formats, architectures, and PostgreSQL majors. Install only the matching subset below, not every downloaded file.
+This downloads all formats, architectures, and PostgreSQL major versions. Install only the matching subset below, not every downloaded file.
 
 ## Install from downloaded assets
 
@@ -252,4 +252,4 @@ sudo dnf clean all
 
 ## Container image
 
-For macOS, Windows, or a container-based installation, follow [DocumentDB Local](../documentdb-local/index.md). Release 0.117 provides Linux amd64/arm64 images for PostgreSQL 15-18; use a versioned tag rather than `latest` when you need a reproducible version.
+For macOS, Windows, or a container-based installation, follow [DocumentDB Local](../documentdb-local/index.md). Release v0.117 provides Linux amd64/arm64 images for PostgreSQL 15-18; use a versioned tag rather than `latest` when you need a reproducible version.

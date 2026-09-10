@@ -48,7 +48,7 @@ This is the fastest way to get a database running. The wizard handles the contai
 
 5. Select **Open Connection** to reveal the saved connection in the Connections view, then expand it to browse databases and collections.
 
-If you keep the sample data option, a `sampledb` database is created with `users`, `products`, `orders`, and `analytics` collections, so you have something to query straight away.
+If you keep the sample data option, a `sampledb` database is created with `users`, `products`, `orders`, and `analytics` collections, so you have something to query immediately.
 
 ### Managing the Instance
 
