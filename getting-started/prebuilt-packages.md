@@ -132,6 +132,20 @@ Note the two version grammars: on DEB the extension keeps `0.117-0` while every 
 
 Other targets — PostgreSQL 15/16, Debian 11/12/13, Ubuntu 22.04, and RHEL-compatible 8 — are not in the current hosted package matrix. The [package repository](https://documentdb.io/packages) does not retain older packages for those targets. Existing installations keep running, but cannot receive updates or reinstall those packages from that repository. Use matching older GitHub release assets or build from the chosen tag; the [0.117 packaging guide](https://github.com/documentdb/documentdb/blob/v0.117-0/packaging/README.md) describes build-on-demand options. PostgreSQL 15 is extension-only: `documentdb-setup` needs 16 or newer.
 
+That withdrawal, which began with v0.116, also covers the older PostgreSQL 16 extension packages previously served from the Ubuntu 24.04 and RHEL-compatible 9 repositories, so a host on one of those repositories can no longer reinstall the package it was set up from. Empty signed metadata remains at the retired repository URLs so package-manager refreshes do not break unrelated operations. Remove the repository configuration on a host that will not move to the current matrix:
+
+```bash
+# Debian / Ubuntu
+sudo rm -f /etc/apt/sources.list.d/documentdb.list
+sudo apt update
+
+# RHEL-compatible
+sudo rm -f /etc/yum.repos.d/documentdb.repo
+sudo dnf clean all
+```
+
+Community builds for other targets are welcome; the packaging scripts stay version-parametric. `build_packages.sh` builds the extension, `gateway/build_gateway_packages.sh` builds the gateway, and `build_extra_packages.sh` builds the common, tools, stand-alone, and meta packages.
+
 ## Container image
 
 ```bash
