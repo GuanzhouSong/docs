@@ -9,37 +9,51 @@ description: Install DocumentDB from the package repository, or from the release
 
 This page covers the **release assets** instead: what each release publishes, and how to install from downloaded files.
 
+## Download and verify
+
+The current release is [`v0.117-0`](https://github.com/documentdb/documentdb/releases/tag/v0.117-0), published on **2026-09-10**. It includes 22 Linux packages, plus `SHA256SUMS` and `manifest.txt`.
+
+```bash
+gh release download v0.117-0 -R documentdb/documentdb -D pkgs && cd pkgs && sha256sum -c SHA256SUMS
+```
+
+This downloads both package formats, both architectures, and both supported PostgreSQL majors. Install only the matching subset below, not every downloaded file. The [release notes](https://github.com/documentdb/documentdb/releases/tag/v0.117-0) describe the changes in this version.
+
 ## Install from downloaded assets
 
 Enable the PostgreSQL upstream (PGDG) repository first; RHEL-compatible hosts also need EPEL and CRB — see [Package Installation](https://documentdb.io/packages).
 
-Pass all six files for your platform to **one** command. `apt` and `dnf` resolve dependencies only from repository indexes, so the meta package alone fails with `documentdb : Depends: documentdb-18 (>= 0.116.0) but it is not installable`.
+Pass the matching package set to **one** command. `apt` and `dnf` need all local dependencies in the same transaction, so the meta package alone fails with `documentdb : Depends: documentdb-18 (>= 0.117.0) but it is not installable`.
 
 ### DEB (Ubuntu 24.04, PostgreSQL 18, amd64)
 
-For arm64 swap `amd64` → `arm64`; for PostgreSQL 17 swap `18` → `17`. Only the gateway and extension assets are arch-specific — the other four are `_all.deb`.
+For arm64 swap `amd64` → `arm64`. Only the gateway and extension assets are arch-specific — the other four are `_all.deb`.
 
 ```bash
-sudo apt install ./ubuntu24.04-documentdb_0.116.0_all.deb \
-                 ./ubuntu24.04-documentdb-18_0.116.0_all.deb \
-                 ./ubuntu24.04-documentdb-common_0.116.0_all.deb \
-                 ./ubuntu24.04-documentdb-postgresql-tools_0.116.0_all.deb \
-                 ./ubuntu24.04-documentdb-gateway_0.116.0_amd64.deb \
-                 ./ubuntu24.04-postgresql-18-documentdb_0.116-0_amd64.deb
+sudo apt install ./ubuntu24.04-documentdb_0.117.0_all.deb \
+                 ./ubuntu24.04-documentdb-18_0.117.0_all.deb \
+                 ./ubuntu24.04-documentdb-common_0.117.0_all.deb \
+                 ./ubuntu24.04-documentdb-postgresql-tools_0.117.0_all.deb \
+                 ./ubuntu24.04-documentdb-gateway_0.117.0_amd64.deb \
+                 ./ubuntu24.04-postgresql-18-documentdb_0.117-0_amd64.deb
 ```
+
+For PostgreSQL 17, select `documentdb-17` and `postgresql-17-documentdb` instead and **omit `ubuntu24.04-documentdb_0.117.0_all.deb`**. The meta package always selects PG18; the PG17 installation uses five files.
 
 ### RPM (RHEL-compatible 9, PostgreSQL 18, x86_64)
 
-For arm64 swap `x86_64` → `aarch64`; for PostgreSQL 17 swap `18` → `17`. Only the gateway and extension assets are arch-specific; the other four are `noarch`.
+For arm64 swap `x86_64` → `aarch64`. Only the gateway and extension assets are arch-specific; the other four are `noarch`.
 
 ```bash
-sudo dnf install ./documentdb-0.116.0-1.noarch.rpm \
-                 ./documentdb-18-0.116.0-1.noarch.rpm \
-                 ./documentdb-common-0.116.0-1.noarch.rpm \
-                 ./documentdb-postgresql-tools-0.116.0-1.noarch.rpm \
-                 ./documentdb-gateway-0.116.0-1.el9.x86_64.rpm \
-                 ./rhel9-postgresql18-documentdb-0.116.0-1.el9.x86_64.rpm
+sudo dnf install ./documentdb-0.117.0-1.noarch.rpm \
+                 ./documentdb-18-0.117.0-1.noarch.rpm \
+                 ./documentdb-common-0.117.0-1.noarch.rpm \
+                 ./documentdb-postgresql-tools-0.117.0-1.noarch.rpm \
+                 ./documentdb-gateway-0.117.0-1.el9.x86_64.rpm \
+                 ./rhel9-postgresql18-documentdb-0.117.0-1.el9.x86_64.rpm
 ```
+
+For PostgreSQL 17, select `documentdb-17` and `rhel9-postgresql17-documentdb` instead and **omit `documentdb-0.117.0-1.noarch.rpm`**. The meta package always selects PG18; the PG17 installation uses five files.
 
 The `ubuntu24.04-` and `rhel9-` filename prefixes disambiguate release assets; they are not part of the package name.
 
@@ -48,8 +62,10 @@ The `ubuntu24.04-` and `rhel9-` filename prefixes disambiguate release assets; t
 If the host already has PostgreSQL and the PGDG extension dependencies (`postgresql-N-cron`, `-pgvector`, `-postgis-3`), the extension installs from one file — no gateway, no `documentdb-setup`:
 
 ```bash
-sudo apt install ./ubuntu24.04-postgresql-18-documentdb_0.116-0_amd64.deb
+sudo apt install ./ubuntu24.04-postgresql-18-documentdb_0.117-0_amd64.deb
 ```
+
+In 0.117, `documentdb_extended_rum` is required by default on every supported PostgreSQL major. For extension-only setup, configure the PostgreSQL instance with `documentdb-tune`, restart it, and run both extension-creation statements it prints. `CREATE EXTENSION documentdb CASCADE` does not create `documentdb_extended_rum` automatically.
 
 ### Offline / air-gapped
 
@@ -74,16 +90,20 @@ mongosh localhost:10260 -u admin -p '<PASSWORD>' --authenticationMechanism SCRAM
 
 > The gateway binds all interfaces (`0.0.0.0:10260`) by default, even though it is reached at `127.0.0.1` above. Firewall the port and supply a real certificate before exposing it to a network.
 
+Add `--load-sample-data` to the setup command to load the optional `StoreData` dataset. This requires `mongosh`; see [Built-in sample data](https://documentdb.io/docs/documentdb-local/#built-in-sample-data) for the collection contents.
+
+> **Pre-GA:** In-place package upgrades from earlier releases are not supported yet. Use a clean host, or remove previous DocumentDB packages first.
+
 ## What each release publishes
 
-[`v0.116-0`](https://github.com/documentdb/documentdb/releases/tag/v0.116-0) (2026-08-20) — Linux packages only; no macOS or Windows installers. It also carries the unpublished `v0.115-0` changes. Fix list: [release notes](https://github.com/documentdb/documentdb/releases/tag/v0.116-0).
+The `v0.117-0` native assets are Linux packages; there are no macOS or Windows installers. Use the container image below on those hosts.
 
 Since `v0.116-0` a release publishes a package set rather than a lone extension:
 
 | Package | Role |
 | --- | --- |
 | `documentdb` (meta) + `documentdb-N` | Full stand-alone install. Pins PostgreSQL major N and its extension, and owns the systemd lifecycle. The meta package pins PostgreSQL 18. |
-| `postgresql-N-documentdb` | The PostgreSQL extension for major N (files only). |
+| `postgresql-N-documentdb` (DEB) / `postgresqlN-documentdb` (RPM) | The PostgreSQL extension for major N (files only). |
 | `documentdb-gateway` | Wire-protocol runtime that serves the MongoDB-compatible endpoint. |
 | `documentdb-postgresql-tools` | Administrator helpers: `documentdb-tune`, `documentdb-createcluster`, `documentdb-register-gateway`, `documentdb-gateway-admin`. |
 | `documentdb-common` | Shared, PostgreSQL-agnostic payload: `documentdb-setup`, the systemd template units, helper scripts and sample data. |
@@ -92,39 +112,35 @@ First-party CI builds and tests Ubuntu 24.04 (DEB) and RHEL-compatible 9 (RPM), 
 
 | Family | Architectures | Asset name |
 | --- | --- | --- |
-| DEB | amd64, arm64 | `ubuntu24.04-postgresql-18-documentdb_0.116-0_amd64.deb` |
-| RPM | x86_64, aarch64 | `rhel9-postgresql18-documentdb-0.116.0-1.el9.x86_64.rpm` |
+| DEB | amd64, arm64 | `ubuntu24.04-postgresql-18-documentdb_0.117-0_amd64.deb` |
+| RPM | x86_64, aarch64 | `rhel9-postgresql18-documentdb-0.117.0-1.el9.x86_64.rpm` |
 
-Note the two version grammars: on DEB the extension keeps `0.116-0` while every other package uses `0.116.0`; on RPM everything is `0.116.0-1`.
+Note the two version grammars: on DEB the extension keeps `0.117-0` while every other package uses `0.117.0`; on RPM the version is `0.117.0`, with release `1` or `1.el9`.
 
-Everything else — PostgreSQL 15/16, Debian 11/12/13, Ubuntu 22.04, RHEL-compatible 8 — is not built by first-party CI for this release. The [package repository](https://documentdb.io/packages) serves those targets the extension package from an earlier release, or build from the tag with the scripts in [`packaging/`](https://github.com/documentdb/documentdb/blob/main/packaging/README.md). PostgreSQL 15 is extension-only: `documentdb-setup` needs 16 or newer.
-
-Every release also ships `SHA256SUMS` and `manifest.txt`:
-
-```bash
-gh release download v0.116-0 -R documentdb/documentdb -D pkgs && cd pkgs && sha256sum -c SHA256SUMS
-```
+Other targets — PostgreSQL 15/16, Debian 11/12/13, Ubuntu 22.04, and RHEL-compatible 8 — are not in the current hosted package matrix. The [package repository](https://documentdb.io/packages) does not retain older packages for those targets. Existing installations keep running, but cannot receive updates or reinstall those packages from that repository. Use matching older GitHub release assets or build from the chosen tag; the [0.117 packaging guide](https://github.com/documentdb/documentdb/blob/v0.117-0/packaging/README.md) describes build-on-demand options. PostgreSQL 15 is extension-only: `documentdb-setup` needs 16 or newer.
 
 ## Container image
 
 ```bash
 docker run -dt -p 10260:10260 --name documentdb-container \
-  ghcr.io/documentdb/documentdb/documentdb-local:latest \
+  ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0 \
   --username <YOUR_USERNAME> --password <YOUR_PASSWORD>
 ```
 
 Credentials must be set at create time or authentication will not work. Port `10260` avoids clashing with a local MongoDB; if you prefer `27017`, change both the `-p` flag and your connection string.
 
-`v0.116-0` publishes these multi-architecture tags (linux/amd64 and linux/arm64):
+`v0.117-0` publishes these multi-architecture tags (linux/amd64 and linux/arm64):
 
-- `ghcr.io/documentdb/documentdb/documentdb-local:pg15-0.116.0`
-- `ghcr.io/documentdb/documentdb/documentdb-local:pg16-0.116.0`
-- `ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.116.0`
-- `ghcr.io/documentdb/documentdb/documentdb-local:pg18-0.116.0`
-- `ghcr.io/documentdb/documentdb/documentdb-local:latest` (currently aliases `pg17-0.116.0`)
+- `ghcr.io/documentdb/documentdb/documentdb-local:pg15-0.117.0`
+- `ghcr.io/documentdb/documentdb/documentdb-local:pg16-0.117.0`
+- `ghcr.io/documentdb/documentdb/documentdb-local:pg17-0.117.0`
+- `ghcr.io/documentdb/documentdb/documentdb-local:pg18-0.117.0`
+- `ghcr.io/documentdb/documentdb/documentdb-local:latest` (currently aliases `pg17-0.117.0`)
+
+Use a versioned tag when you need a reproducible release rather than whichever version `latest` points to later.
 
 Each image records the release it was built from in `/version.txt` and in its OCI labels:
 
 ```bash
-docker run --rm --entrypoint cat ghcr.io/documentdb/documentdb/documentdb-local:pg18-0.116.0 /version.txt
+docker run --rm --entrypoint cat ghcr.io/documentdb/documentdb/documentdb-local:pg18-0.117.0 /version.txt
 ```
